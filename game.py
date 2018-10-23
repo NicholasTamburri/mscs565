@@ -23,6 +23,26 @@ SCREEN_HEIGHT = 500
 # --- Classes ---
 
 
+class Arrow(pygame.sprite.Sprite):
+    """ The player-controlled arrow that shoots bubbles. """
+
+    def __init__(self):
+        super().__init__()
+        self.image = pygame.Surface([8, 55])
+        self.image.fill(WHITE)
+        pygame.draw.line(self.image, BLACK, [4, 0], [4, 50])
+        pygame.draw.line(self.image, BLACK, [4, 50], [0, 54])
+        pygame.draw.line(self.image, BLACK, [4, 50], [8, 54])
+        pygame.draw.polygon(self.image, BLACK, [
+            [4, 0],
+            [0, 10],
+            [8, 10]
+        ])
+        self.rect = self.image.get_rect()
+        self.rect.x = 300
+        self.rect.y = 300
+
+
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a simple block the player collects. """
 
@@ -96,6 +116,10 @@ class Game(object):
         # Create the player
         self.player = Player()
         self.all_sprites_list.add(self.player)
+
+        # Create the arrow
+        self.arrow = Arrow()
+        self.all_sprites_list.add(self.arrow)
 
     def process_events(self):
         """ Process all of the events. Return a "True" if we need
