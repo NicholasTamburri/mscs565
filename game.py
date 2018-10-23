@@ -29,9 +29,11 @@ class Arrow(pygame.sprite.Sprite):
     LENGTH = 50
     WIDTH = 8
 
+    BASE_IMAGE = pygame.Surface([WIDTH + 1, LENGTH])
+
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface([Arrow.WIDTH + 1, Arrow.LENGTH])
+        self.image = Arrow.BASE_IMAGE
         self.image.fill(WHITE)
         pygame.draw.line(self.image, BLACK,
                          [Arrow.WIDTH / 2, 0],
@@ -50,6 +52,12 @@ class Arrow(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = 300
         self.rect.y = 300
+
+        self.angle = 0
+
+    def update(self):
+        self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
+        self.angle = (self.angle + 1) % 360
 
 
 class Bubble(pygame.sprite.Sprite):
