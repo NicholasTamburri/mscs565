@@ -1,12 +1,10 @@
 """
-Show the proper way to organize a game using the a game class.
+Nicholas Tamburri
+Version 0.0.1
 
-Sample Python/Pygame Programs
-Simpson College Computer Science
-http://programarcadegames.com/
-http://simpson.edu/computer-science/
+Game code for Bust-a-Move ripoff.
 
-Explanation video: http://youtu.be/O4Y5KrNgP_c
+Play by shooting bubbles at other bubbles.
 """
 
 import pygame
@@ -25,15 +23,17 @@ SCREEN_HEIGHT = 500
 # --- Classes ---
 
 
-class Block(pygame.sprite.Sprite):
+class Bubble(pygame.sprite.Sprite):
     """ This class represents a simple block the player collects. """
 
     def __init__(self):
         """ Constructor, create the image of the block. """
         super().__init__()
         self.image = pygame.Surface([20, 20])
-        self.image.fill(BLACK)
+        self.image.fill(WHITE)
+        pygame.draw.circle(self.image, BLACK, [10, 10], 10)
         self.rect = self.image.get_rect()
+        self.radius = 10
 
     def reset_pos(self):
         """ Called when the block is 'collected' or falls off
@@ -55,8 +55,10 @@ class Player(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
         self.image = pygame.Surface([20, 20])
-        self.image.fill(RED)
+        self.image.fill(WHITE)
+        pygame.draw.circle(self.image, RED, [10, 10], 10)
         self.rect = self.image.get_rect()
+        self.radius = 10
 
     def update(self):
         """ Update the player location. """
@@ -83,7 +85,7 @@ class Game(object):
 
         # Create the block sprites
         for i in range(50):
-            block = Block()
+            block = Bubble()
 
             block.rect.x = random.randrange(SCREEN_WIDTH)
             block.rect.y = random.randrange(-300, SCREEN_HEIGHT)
@@ -118,7 +120,12 @@ class Game(object):
             self.all_sprites_list.update()
 
             # See if the player block has collided with anything.
-            blocks_hit_list = pygame.sprite.spritecollide(self.player, self.block_list, True)
+            blocks_hit_list = pygame.sprite.spritecollide(
+                self.player,
+                self.block_list,
+                True,
+                pygame.sprite.collide_circle
+            )
 
             # Check the list of collisions.
             for block in blocks_hit_list:
