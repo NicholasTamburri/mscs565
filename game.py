@@ -2,7 +2,7 @@
 Nicholas Tamburri
 Version 0.0.1
 
-Game code for Bust-a-Move ripoff.
+Game code for Bust-a-Move clone.
 
 Play by shooting bubbles at other bubbles.
 """
@@ -26,17 +26,26 @@ SCREEN_HEIGHT = 500
 class Arrow(pygame.sprite.Sprite):
     """ The player-controlled arrow that shoots bubbles. """
 
+    LENGTH = 50
+    WIDTH = 8
+
     def __init__(self):
         super().__init__()
-        self.image = pygame.Surface([8, 55])
+        self.image = pygame.Surface([Arrow.WIDTH + 1, Arrow.LENGTH])
         self.image.fill(WHITE)
-        pygame.draw.line(self.image, BLACK, [4, 0], [4, 50])
-        pygame.draw.line(self.image, BLACK, [4, 50], [0, 54])
-        pygame.draw.line(self.image, BLACK, [4, 50], [8, 54])
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, 0],
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2])
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
+                         [1, Arrow.LENGTH])
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
+                         [Arrow.WIDTH - 1, Arrow.LENGTH])
         pygame.draw.polygon(self.image, BLACK, [
-            [4, 0],
-            [0, 10],
-            [8, 10]
+            [Arrow.WIDTH / 2, 0],
+            [0, Arrow.WIDTH * 2],
+            [Arrow.WIDTH, Arrow.WIDTH * 2]
         ])
         self.rect = self.image.get_rect()
         self.rect.x = 300
