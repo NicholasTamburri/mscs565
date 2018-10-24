@@ -156,11 +156,14 @@ class Game(object):
                     self.__init__()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    self.arrow.change_angle = 1
+                    self.arrow.change_angle += 1
                 if event.key == pygame.K_RIGHT:
-                    self.arrow.change_angle = -1
+                    self.arrow.change_angle -= 1
             if event.type == pygame.KEYUP:
-                self.arrow.change_angle = 0
+                if event.key == pygame.K_LEFT:
+                    self.arrow.change_angle -= 1
+                if event.key == pygame.K_RIGHT:
+                    self.arrow.change_angle += 1
 
         return False
 
