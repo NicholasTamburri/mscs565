@@ -58,6 +58,11 @@ class Arrow(pygame.sprite.Sprite):
 
     def update(self):
         self.angle += self.change_angle
+        if self.angle >= 89:
+            self.angle = 88
+        if self.angle <= -89:
+            self.angle = -88
+
         self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
 
 
