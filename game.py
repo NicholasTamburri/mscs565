@@ -50,8 +50,8 @@ class Arrow(pygame.sprite.Sprite):
             [Arrow.WIDTH, Arrow.WIDTH * 2]
         ])
         self.rect = self.image.get_rect()
-        self.rect.x = 300
-        self.rect.y = 300
+        self.rect.centerx = 300
+        self.rect.centery = 300
 
         self.angle = 0
         self.change_angle = 0
@@ -64,6 +64,9 @@ class Arrow(pygame.sprite.Sprite):
             self.angle = -88
 
         self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = 300
+        self.rect.centery = 300
 
 
 class Bubble(pygame.sprite.Sprite):
@@ -164,6 +167,7 @@ class Game(object):
                     self.arrow.change_angle -= 1
                 if event.key == pygame.K_RIGHT:
                     self.arrow.change_angle += 1
+                    print(self.arrow.rect.right, self.arrow.image.get_rect().right)
 
         return False
 
