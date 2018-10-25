@@ -27,8 +27,11 @@ SCREEN_HEIGHT = 500
 class Arrow(pygame.sprite.Sprite):
     """ The player-controlled arrow that shoots bubbles. """
 
-    LENGTH = 50
-    WIDTH = 8
+    LENGTH = 100
+    WIDTH = 12
+
+    HOME_X = SCREEN_WIDTH / 2 - 1
+    HOME_Y = SCREEN_HEIGHT - 101
 
     BASE_IMAGE = pygame.Surface([WIDTH + 1, LENGTH])
 
@@ -51,10 +54,12 @@ class Arrow(pygame.sprite.Sprite):
             [Arrow.WIDTH, Arrow.WIDTH * 2]
         ])
         self.rect = self.image.get_rect()
-        self.rect.centerx = 300
-        self.rect.centery = 300
+        self.rect.centerx = Arrow.HOME_X
+        self.rect.centery = Arrow.HOME_Y
 
-        self.angle = 0
+        # Angle is in degrees.
+        # 0 is straight up, positive is left, negative is right
+        self.angle = 0 # degrees
         self.change_angle = 0
 
     def update(self):
@@ -66,8 +71,8 @@ class Arrow(pygame.sprite.Sprite):
 
         self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
         self.rect = self.image.get_rect()
-        self.rect.centerx = 300
-        self.rect.centery = 300
+        self.rect.centerx = Arrow.HOME_X
+        self.rect.centery = Arrow.HOME_Y
 
 
 class Bubble(pygame.sprite.Sprite):
@@ -91,10 +96,12 @@ class Bubble(pygame.sprite.Sprite):
         self.y_change = 0
 
     def reset_pos(self):
-        """ Called when the block is 'collected' or falls off
-            the screen. """
-        self.rect.centery = random.randrange(-300, -20)
-        self.rect.centerx = random.randrange(SCREEN_WIDTH)
+        """ Called when the bubble falls off the screen. """
+        self.x_change = 0
+        self.y_change = 0
+
+        self.rect.centerx = Arrow.HOME_X
+        self.rect.centery = Arrow.HOME_Y
 
         self.float_centerx = float(self.rect.centerx)
         self.float_centery = float(self.rect.centery)
@@ -106,6 +113,12 @@ class Bubble(pygame.sprite.Sprite):
 
         self.rect.centerx = int(self.float_centerx)
         self.rect.centery = int(self.float_centery)
+
+        # Ricochet off borders
+        if self.rect.left < 0 or self.rect.right >= SCREEN_WIDTH:
+            self.x_change *= -1
+        if self.rect.top < 0:
+            self.y_change *= -1
 
         if self.rect.centery > SCREEN_HEIGHT + self.rect.height:
             self.reset_pos()
@@ -160,8 +173,9 @@ class Game(object):
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
                     and self.bubble.x_change == 0 and self.bubble.y_change == 0:
-                self.bubble.x_change = -math.cos(math.radians(self.arrow.angle - 90))
-                self.bubble.y_change = math.sin(math.radians(self.arrow.angle - 90))
+                speed = 5
+                self.bubble.x_change = -math.cos(math.radians(self.arrow.angle - 90)) * speed
+                self.bubble.y_change = math.sin(math.radians(self.arrow.angle - 90)) * speed
 
         return False
 
