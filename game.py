@@ -73,20 +73,22 @@ class Arrow(pygame.sprite.Sprite):
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a simple block the player collects. """
 
-    def __init__(self):
+    def __init__(self, centerx, centery):
         """ Constructor, create the image of the block. """
         super().__init__()
         self.image = pygame.Surface([20, 20])
         self.image.fill(WHITE)
         pygame.draw.circle(self.image, BLACK, [10, 10], 10)
         self.rect = self.image.get_rect()
+        self.rect.centerx = centerx
+        self.rect.centery = centery
         self.radius = 10
 
         self.float_centerx = float(self.rect.centerx)
         self.float_centery = float(self.rect.centery)
 
         self.x_change = 0
-        self.y_change = 1
+        self.y_change = 0
 
     def reset_pos(self):
         """ Called when the block is 'collected' or falls off
@@ -104,13 +106,6 @@ class Bubble(pygame.sprite.Sprite):
 
         self.rect.centerx = int(self.float_centerx)
         self.rect.centery = int(self.float_centery)
-
-        # self.rect = self.image.get_rect()
-        # self.rect.centerx = 300
-        # self.rect.centery = 300
-
-        # self.rect.centerx += self.x_change
-        # self.rect.centery += self.y_change
 
         if self.rect.centery > SCREEN_HEIGHT + self.rect.height:
             self.reset_pos()
@@ -132,22 +127,17 @@ class Game(object):
         self.block_list = pygame.sprite.Group()
         self.all_sprites_list = pygame.sprite.Group()
 
-        # Create the block sprites
-        for i in range(50):
-            block = Bubble()
-
-            block.rect.centerx = random.randrange(SCREEN_WIDTH)
-            block.rect.centery = random.randrange(-300, SCREEN_HEIGHT)
-
-            block.float_centerx = block.rect.centerx
-            block.float_centery = block.rect.centery
-
-            self.block_list.add(block)
-            self.all_sprites_list.add(block)
-
         # Create the arrow
         self.arrow = Arrow()
         self.all_sprites_list.add(self.arrow)
+
+        print(self.arrow.rect.centerx, self.arrow.rect.centery)
+
+        # Create the bubble
+        self.block = Bubble(self.arrow.rect.centerx, self.arrow.rect.centery)
+        print(self.block.rect.centerx, self.block.rect.centery)
+        self.block_list.add(self.block)
+        self.all_sprites_list.add(self.block)
 
     def process_events(self):
         """ Process all of the events. Return a "True" if we need
