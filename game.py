@@ -116,24 +116,6 @@ class Bubble(pygame.sprite.Sprite):
             self.reset_pos()
 
 
-class Player(pygame.sprite.Sprite):
-    """ This class represents the player. """
-
-    def __init__(self):
-        super().__init__()
-        self.image = pygame.Surface([20, 20])
-        self.image.fill(WHITE)
-        pygame.draw.circle(self.image, RED, [10, 10], 10)
-        self.rect = self.image.get_rect()
-        self.radius = 10
-
-    def update(self):
-        """ Update the player location. """
-        pos = pygame.mouse.get_pos()
-        self.rect.x = pos[0]
-        self.rect.y = pos[1]
-
-
 class Game(object):
     """ This class represents an instance of the game. If we need to
         reset the game we'd just need to create a new instance of this
@@ -162,10 +144,6 @@ class Game(object):
 
             self.block_list.add(block)
             self.all_sprites_list.add(block)
-
-        # Create the player
-        self.player = Player()
-        self.all_sprites_list.add(self.player)
 
         # Create the arrow
         self.arrow = Arrow()
@@ -209,23 +187,6 @@ class Game(object):
             # Move all the sprites
             self.all_sprites_list.update()
 
-            # See if the player block has collided with anything.
-            blocks_hit_list = pygame.sprite.spritecollide(
-                self.player,
-                self.block_list,
-                True,
-                pygame.sprite.collide_circle
-            )
-
-            # Check the list of collisions.
-            for block in blocks_hit_list:
-                self.score += 1
-                print(self.score)
-                # You can do something with "block" here.
-
-            if len(self.block_list) == 0:
-                self.game_over = True
-
     def display_frame(self, screen):
         """ Display everything to the screen for the game. """
         screen.fill(WHITE)
@@ -253,7 +214,6 @@ def main():
     screen = pygame.display.set_mode(size)
 
     pygame.display.set_caption("My Game")
-    pygame.mouse.set_visible(False)
 
     # Create our objects and set the data
     done = False
