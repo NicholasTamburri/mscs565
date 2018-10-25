@@ -124,20 +124,17 @@ class Game(object):
         self.game_over = False
 
         # Create sprite lists
-        self.block_list = pygame.sprite.Group()
+        self.bubble_list = pygame.sprite.Group()
         self.all_sprites_list = pygame.sprite.Group()
 
         # Create the arrow
         self.arrow = Arrow()
         self.all_sprites_list.add(self.arrow)
 
-        print(self.arrow.rect.centerx, self.arrow.rect.centery)
-
         # Create the bubble
-        self.block = Bubble(self.arrow.rect.centerx, self.arrow.rect.centery)
-        print(self.block.rect.centerx, self.block.rect.centery)
-        self.block_list.add(self.block)
-        self.all_sprites_list.add(self.block)
+        self.bubble = Bubble(self.arrow.rect.centerx, self.arrow.rect.centery)
+        self.bubble_list.add(self.bubble)
+        self.all_sprites_list.add(self.bubble)
 
     def process_events(self):
         """ Process all of the events. Return a "True" if we need
@@ -161,10 +158,10 @@ class Game(object):
                 if event.key == pygame.K_RIGHT:
                     self.arrow.change_angle += 1
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                for bubble in self.block_list:
-                    bubble.x_change = -math.cos(math.radians(self.arrow.angle - 90))
-                    bubble.y_change = math.sin(math.radians(self.arrow.angle - 90))
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
+                    and self.bubble.x_change == 0 and self.bubble.y_change == 0:
+                self.bubble.x_change = -math.cos(math.radians(self.arrow.angle - 90))
+                self.bubble.y_change = math.sin(math.radians(self.arrow.angle - 90))
 
         return False
 
