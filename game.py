@@ -81,6 +81,9 @@ class Bubble(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = 10
 
+        self.x_change = 0
+        self.y_change = 1
+
     def reset_pos(self):
         """ Called when the block is 'collected' or falls off
             the screen. """
@@ -89,7 +92,8 @@ class Bubble(pygame.sprite.Sprite):
 
     def update(self):
         """ Automatically called when we need to move the block. """
-        self.rect.y += 1
+        self.rect.x += self.x_change
+        self.rect.y += self.y_change
 
         if self.rect.y > SCREEN_HEIGHT + self.rect.height:
             self.reset_pos()
@@ -157,6 +161,7 @@ class Game(object):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.game_over:
                     self.__init__()
+
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
                     self.arrow.change_angle += 1
@@ -167,7 +172,13 @@ class Game(object):
                     self.arrow.change_angle -= 1
                 if event.key == pygame.K_RIGHT:
                     self.arrow.change_angle += 1
-                    print(self.arrow.rect.right, self.arrow.image.get_rect().right)
+
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                up_dir = pygame.math.Vector2(0, -1)
+                new_dir = pygame.math.Vector2.rotate(up_dir, self.arrow.angle)
+                for bubble in self.block_list:
+                    bubble.x_change = -new_dir[0] * 10
+                    bubble.y_change = new_dir[1] * 10
 
         return False
 
