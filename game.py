@@ -7,6 +7,7 @@ Game code for Bust-a-Move clone.
 Play by shooting bubbles at other bubbles.
 """
 
+import math
 import pygame
 import random
 
@@ -81,21 +82,37 @@ class Bubble(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.radius = 10
 
+        self.float_centerx = float(self.rect.centerx)
+        self.float_centery = float(self.rect.centery)
+
         self.x_change = 0
         self.y_change = 1
 
     def reset_pos(self):
         """ Called when the block is 'collected' or falls off
             the screen. """
-        self.rect.y = random.randrange(-300, -20)
-        self.rect.x = random.randrange(SCREEN_WIDTH)
+        self.rect.centery = random.randrange(-300, -20)
+        self.rect.centerx = random.randrange(SCREEN_WIDTH)
+
+        self.float_centerx = float(self.rect.centerx)
+        self.float_centery = float(self.rect.centery)
 
     def update(self):
         """ Automatically called when we need to move the block. """
-        self.rect.x += self.x_change
-        self.rect.y += self.y_change
+        self.float_centerx += self.x_change
+        self.float_centery += self.y_change
 
-        if self.rect.y > SCREEN_HEIGHT + self.rect.height:
+        self.rect.centerx = int(self.float_centerx)
+        self.rect.centery = int(self.float_centery)
+
+        # self.rect = self.image.get_rect()
+        # self.rect.centerx = 300
+        # self.rect.centery = 300
+
+        # self.rect.centerx += self.x_change
+        # self.rect.centery += self.y_change
+
+        if self.rect.centery > SCREEN_HEIGHT + self.rect.height:
             self.reset_pos()
 
 
@@ -137,8 +154,11 @@ class Game(object):
         for i in range(50):
             block = Bubble()
 
-            block.rect.x = random.randrange(SCREEN_WIDTH)
-            block.rect.y = random.randrange(-300, SCREEN_HEIGHT)
+            block.rect.centerx = random.randrange(SCREEN_WIDTH)
+            block.rect.centery = random.randrange(-300, SCREEN_HEIGHT)
+
+            block.float_centerx = block.rect.centerx
+            block.float_centery = block.rect.centery
 
             self.block_list.add(block)
             self.all_sprites_list.add(block)
@@ -174,11 +194,9 @@ class Game(object):
                     self.arrow.change_angle += 1
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                up_dir = pygame.math.Vector2(0, -1)
-                new_dir = pygame.math.Vector2.rotate(up_dir, self.arrow.angle)
                 for bubble in self.block_list:
-                    bubble.x_change = -new_dir[0] * 10
-                    bubble.y_change = new_dir[1] * 10
+                    bubble.x_change = -math.cos(math.radians(self.arrow.angle - 90))
+                    bubble.y_change = math.sin(math.radians(self.arrow.angle - 90))
 
         return False
 
