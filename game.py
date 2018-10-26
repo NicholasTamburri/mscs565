@@ -80,11 +80,12 @@ class Arrow(pygame.sprite.Sprite):
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a bubble. """
     RADIUS = 10
+    DIAMETER = RADIUS * 2
 
     def __init__(self, centerx, centery):
         """ Constructor, create the image of the block. """
         super().__init__()
-        self.image = pygame.Surface([2 * Bubble.RADIUS, 2 * Bubble.RADIUS])
+        self.image = pygame.Surface([Bubble.DIAMETER, Bubble.DIAMETER])
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
 
@@ -144,11 +145,11 @@ class Ceiling(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.image = pygame.Surface([8 * 2 * Bubble.RADIUS, 1])
+        self.image = pygame.Surface([8 * Bubble.DIAMETER, 1])
         self.image.fill(BLACK)
 
         self.rect = self.image.get_rect()
-        self.rect.x = SCREEN_WIDTH / 2 - 4 * 2 * Bubble.RADIUS
+        self.rect.x = SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER
         self.rect.y = 50
 
 
@@ -187,8 +188,8 @@ class Game(object):
 
         # Create play field borders
         self.ceiling = Ceiling()
-        self.left_wall = Wall(SCREEN_WIDTH / 2 - 4 * 2 * Bubble.RADIUS)
-        self.right_wall = Wall(SCREEN_WIDTH / 2 + 4 * 2 * Bubble.RADIUS)
+        self.left_wall = Wall(SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER)
+        self.right_wall = Wall(SCREEN_WIDTH / 2 + 4 * Bubble.DIAMETER)
         self.all_sprites_list.add(self.ceiling)
         self.all_sprites_list.add(self.left_wall)
         self.all_sprites_list.add(self.right_wall)
