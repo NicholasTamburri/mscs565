@@ -199,11 +199,13 @@ class Game(object):
         self.all_sprites_list.add(self.arrow)
 
         # Create some board bubbles
-        for i in range(8):
-            bubble = Bubble(self.left_wall.rect.right + Bubble.RADIUS + 2 * i * Bubble.RADIUS,
-                            self.ceiling.rect.bottom + Bubble.RADIUS)
-            self.bubble_list.add(bubble)
-            self.all_sprites_list.add(bubble)
+        for x in range(8):
+            x_pos = self.left_wall.rect.right + Bubble.RADIUS + x * Bubble.DIAMETER
+            for y in range(11):
+                y_pos = self.ceiling.rect.bottom + Bubble.RADIUS + y * Bubble.DIAMETER
+                bubble = Bubble(x_pos, y_pos)
+                self.bubble_list.add(bubble)
+                self.all_sprites_list.add(bubble)
 
         # Create the player's bubble
         self.bubble = PlayerBubble(self.arrow.rect.centerx,
