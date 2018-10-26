@@ -79,18 +79,20 @@ class Arrow(pygame.sprite.Sprite):
 
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a bubble. """
+    RADIUS = 10
+
     def __init__(self, centerx, centery):
         """ Constructor, create the image of the block. """
         super().__init__()
-        self.image = pygame.Surface([20, 20])
+        self.image = pygame.Surface([2 * Bubble.RADIUS, 2 * Bubble.RADIUS])
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
 
-        pygame.draw.circle(self.image, BLACK, [10, 10], 10)
+        pygame.draw.circle(self.image, BLACK, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
         self.rect = self.image.get_rect()
         self.rect.centerx = centerx
         self.rect.centery = centery
-        self.radius = 10
+        self.radius = self.rect.width / 2
 
         self.float_centerx = float(self.rect.centerx)
         self.float_centery = float(self.rect.centery)
@@ -101,8 +103,8 @@ class Bubble(pygame.sprite.Sprite):
 
 class PlayerBubble(Bubble):
     """ This class represents the bubble that the player shoots. """
-    def __init__(self, centerx, centery):
-        super().__init__(centerx, centery)
+    # def __init__(self, centerx, centery):
+    #     super().__init__(centerx, centery)
 
     def reset_pos(self):
         """ Called when the bubble falls off the screen. """
@@ -195,8 +197,17 @@ class Game(object):
         self.arrow = Arrow()
         self.all_sprites_list.add(self.arrow)
 
+        # Create some board bubbles
+        for i in range(10):
+            bubble = Bubble(self.left_wall.rect.right + Bubble.RADIUS + 2 * i * Bubble.RADIUS,
+                            self.ceiling.rect.bottom + Bubble.RADIUS)
+            self.bubble_list.add(bubble)
+            self.all_sprites_list.add(bubble)
+
+
         # Create the player's bubble
-        self.bubble = PlayerBubble(self.arrow.rect.centerx, self.arrow.rect.centery)
+        self.bubble = PlayerBubble(self.arrow.rect.centerx,
+                                   self.arrow.rect.centery)
         self.bubble_list.add(self.bubble)
         self.all_sprites_list.add(self.bubble)
 
@@ -230,8 +241,9 @@ class Game(object):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
                     and self.bubble.x_change == 0 and self.bubble.y_change == 0:
                 speed = 8
-                self.bubble.x_change = -math.cos(math.radians(self.arrow.angle - 90)) * speed
-                self.bubble.y_change = math.sin(math.radians(self.arrow.angle - 90)) * speed
+                angle = math.radians(self.arrow.angle - 90)
+                self.bubble.x_change = -math.cos(angle) * speed
+                self.bubble.y_change = math.sin(angle) * speed
 
         return False
 
