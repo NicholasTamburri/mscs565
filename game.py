@@ -79,7 +79,7 @@ class Arrow(pygame.sprite.Sprite):
 
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a bubble. """
-    RADIUS = 16
+    RADIUS = 20
     DIAMETER = RADIUS * 2
 
     def __init__(self, centerx, centery):
@@ -166,6 +166,19 @@ class Wall(pygame.sprite.Sprite):
         self.rect.y = 50
 
 
+class KillLine(pygame.sprite.Sprite):
+    """ Game over when board bubbles cross this line. """
+    def __init__(self, y):
+        super().__init__()
+
+        self.image = pygame.Surface([8 * Bubble.DIAMETER, 1])
+        self.image.fill(RED)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER
+        self.rect.y = y
+
+
 class Game(object):
     """ This class represents an instance of the game. If we need to
         reset the game we'd just need to create a new instance of this
@@ -199,6 +212,7 @@ class Game(object):
         self.all_sprites_list.add(self.arrow)
 
         # Create some board bubbles
+        y_pos = 0
         for x in range(8):
             x_pos = self.left_wall.rect.right + Bubble.RADIUS\
                     + x * Bubble.DIAMETER
@@ -218,6 +232,10 @@ class Game(object):
                     bubble = Bubble(x_pos, y_pos)
                     self.bubble_list.add(bubble)
                     self.all_sprites_list.add(bubble)
+
+        # Create the kill line
+        self.kill_line = KillLine(y_pos + Bubble.RADIUS)
+        self.all_sprites_list.add(self.kill_line)
 
         # Create the player's bubble
         self.bubble = PlayerBubble(self.arrow.rect.centerx,
