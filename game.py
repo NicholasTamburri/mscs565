@@ -78,8 +78,7 @@ class Arrow(pygame.sprite.Sprite):
 
 
 class Bubble(pygame.sprite.Sprite):
-    """ This class represents a simple block the player collects. """
-
+    """ This class represents a bubble. """
     def __init__(self, centerx, centery):
         """ Constructor, create the image of the block. """
         super().__init__()
@@ -98,6 +97,12 @@ class Bubble(pygame.sprite.Sprite):
 
         self.x_change = 0
         self.y_change = 0
+
+
+class PlayerBubble(Bubble):
+    """ This class represents the bubble that the player shoots. """
+    def __init__(self, centerx, centery):
+        super().__init__(centerx, centery)
 
     def reset_pos(self):
         """ Called when the bubble falls off the screen. """
@@ -126,6 +131,10 @@ class Bubble(pygame.sprite.Sprite):
 
         if self.rect.centery > SCREEN_HEIGHT + self.rect.height:
             self.reset_pos()
+
+
+# class BoardBubble(Bubble):
+#
 
 
 class Ceiling(pygame.sprite.Sprite):
@@ -186,8 +195,8 @@ class Game(object):
         self.arrow = Arrow()
         self.all_sprites_list.add(self.arrow)
 
-        # Create the bubble
-        self.bubble = Bubble(self.arrow.rect.centerx, self.arrow.rect.centery)
+        # Create the player's bubble
+        self.bubble = PlayerBubble(self.arrow.rect.centerx, self.arrow.rect.centery)
         self.bubble_list.add(self.bubble)
         self.all_sprites_list.add(self.bubble)
 
