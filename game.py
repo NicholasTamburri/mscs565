@@ -386,6 +386,10 @@ class Game(object):
 
             self.bubble.reset_pos()
 
+            # End game if the new bubble is below the kill line
+            if new_bubble.rect.centery > self.kill_line.rect.y:
+                self.game_over = True
+
 
     def display_frame(self, screen):
         """ Display everything to the screen for the game. """
