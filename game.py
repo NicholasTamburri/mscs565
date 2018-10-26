@@ -85,6 +85,8 @@ class Bubble(pygame.sprite.Sprite):
     RADIUS = 20
     DIAMETER = RADIUS * 2
 
+    COLORS = (RED, ORANGE, YELLOW, GREEN, BLUE)
+
     def __init__(self, centerx, centery, color):
         """ Constructor, create the image of the block. """
         super().__init__()
@@ -379,11 +381,13 @@ class Game(object):
                 else:
                     new_x = bubble_hit.rect.centerx - Bubble.RADIUS
 
+            # Add a new bubble, based on the shot bubble, to the board
             new_bubble = Bubble(new_x, new_y, self.bubble.color)
             self.board_bubble_list.add(new_bubble)
             self.bubble_list.add(new_bubble)
             self.all_sprites_list.add(new_bubble)
 
+            # Ready another bubble to be fired
             self.bubble.reset_pos()
 
             # End game if the new bubble is below the kill line
@@ -395,6 +399,9 @@ class Game(object):
         """ Display everything to the screen for the game. """
         screen.fill(WHITE)
 
+        # if not self.game_over:
+        self.all_sprites_list.draw(screen)
+
         if self.game_over:
             # font = pygame.font.Font("Serif", 25)
             font = pygame.font.SysFont("serif", 25)
@@ -402,9 +409,6 @@ class Game(object):
             center_x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             center_y = (SCREEN_HEIGHT // 2) - (text.get_height() // 2)
             screen.blit(text, [center_x, center_y])
-
-        if not self.game_over:
-            self.all_sprites_list.draw(screen)
 
         pygame.display.flip()
 
