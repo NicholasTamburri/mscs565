@@ -220,7 +220,7 @@ class Game(object):
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
                     and self.bubble.x_change == 0 and self.bubble.y_change == 0:
-                speed = 5
+                speed = 8
                 self.bubble.x_change = -math.cos(math.radians(self.arrow.angle - 90)) * speed
                 self.bubble.y_change = math.sin(math.radians(self.arrow.angle - 90)) * speed
 
@@ -246,17 +246,16 @@ class Game(object):
         if self.k_up_is_pressed:
             if self.arrow.angle > 0: # Pointing left
                 self.arrow.change_angle = -1 # Rotate right
-            if self.arrow.angle < 0: # Pointing right
+            elif self.arrow.angle < 0: # Pointing right
                 self.arrow.change_angle = 1 # Rotate left
-            if self.arrow.angle == 0: # Pointing straight up
-                self.arrow.change_angle = 0
-        else:
-            if self.k_left_is_pressed == self.k_right_is_pressed:
-                self.arrow.change_angle = 0
-            elif self.k_left_is_pressed:
-                self.arrow.change_angle = 1
-            elif self.k_right_is_pressed:
-                self.arrow.change_angle = -1
+            else: # Pointing straight up
+                self.arrow.change_angle = 0 # Do not rotate
+        elif self.k_left_is_pressed == self.k_right_is_pressed:
+            self.arrow.change_angle = 0
+        elif self.k_left_is_pressed:
+            self.arrow.change_angle = 1
+        elif self.k_right_is_pressed:
+            self.arrow.change_angle = -1
 
 
     def display_frame(self, screen):
