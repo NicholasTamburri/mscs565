@@ -213,26 +213,50 @@ class Game(object):
 
         # Create some board bubbles
         y_pos = 0
-        for x in range(8):
-            x_pos = self.left_wall.rect.right + Bubble.RADIUS\
-                    + x * Bubble.DIAMETER
-            for y in range(11):
+        for column in range(8):
+            x_pos = self.left_wall.rect.right + Bubble.RADIUS \
+                    + column * Bubble.DIAMETER
+            for row in range(11):
                 # Some math to find vertical spacing of the bubbles
                 distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
                 space = distance - Bubble.DIAMETER
                 y_space = math.sqrt(4 / 5 * space ** 2)
 
-                y_pos = self.ceiling.rect.bottom + Bubble.RADIUS\
-                        + y * (Bubble.DIAMETER - space - y_space)
-                if y % 2 == 1:
+                y_pos = self.ceiling.rect.bottom + Bubble.RADIUS \
+                        + row * (Bubble.DIAMETER - space - y_space)
+                if row % 2 == 1:
                     x_pos += Bubble.RADIUS
-                elif y > 0:
+                elif row > 0:
                     x_pos -= Bubble.RADIUS
-                if x != 7 or y % 2 == 0:
-                    if x % 2 == 0:
+                if column != 7 or row % 2 == 0:
+                    # These lines represent the board pattern
+                    if row == 0:
+                        # Add the bubble
                         bubble = Bubble(x_pos, y_pos)
                         self.bubble_list.add(bubble)
                         self.all_sprites_list.add(bubble)
+                    if row == 1:
+                        if column != 3:
+                            # Add the bubble
+                            bubble = Bubble(x_pos, y_pos)
+                            self.bubble_list.add(bubble)
+                            self.all_sprites_list.add(bubble)
+                    if row == 2:
+                        if column == 1\
+                                or column == 2\
+                                or column == 5\
+                                or column == 6:
+                            # Add the bubble
+                            bubble = Bubble(x_pos, y_pos)
+                            self.bubble_list.add(bubble)
+                            self.all_sprites_list.add(bubble)
+                    if row == 3:
+                        if column == 1\
+                                or column == 5:
+                            # Add the bubble
+                            bubble = Bubble(x_pos, y_pos)
+                            self.bubble_list.add(bubble)
+                            self.all_sprites_list.add(bubble)
 
         # Create the kill line
         self.kill_line = KillLine(y_pos + Bubble.RADIUS)
