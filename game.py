@@ -64,10 +64,10 @@ class Arrow(pygame.sprite.Sprite):
 
     def update(self):
         self.angle += self.change_angle
-        if self.angle >= 89:
-            self.angle = 88
-        if self.angle <= -89:
-            self.angle = -88
+        if self.angle >= 86:
+            self.angle = 85
+        if self.angle <= -86:
+            self.angle = -85
 
         self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
         self.rect = self.image.get_rect()
@@ -124,6 +124,32 @@ class Bubble(pygame.sprite.Sprite):
             self.reset_pos()
 
 
+class Ceiling(pygame.sprite.Sprite):
+    """ Top border of the play field. """
+    def __init__(self):
+        super().__init__()
+
+        self.image = pygame.Surface([400, 1])
+        self.image.fill(BLACK)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = 150
+        self.rect.y = 50
+
+
+class Wall(pygame.sprite.Sprite):
+    """ Left and right borders of the play field. """
+    def __init__(self, x):
+        super().__init__()
+
+        self.image = pygame.Surface([1, SCREEN_HEIGHT])
+        self.image.fill(BLACK)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = 50
+
+
 class Game(object):
     """ This class represents an instance of the game. If we need to
         reset the game we'd just need to create a new instance of this
@@ -139,6 +165,14 @@ class Game(object):
         # Create sprite lists
         self.bubble_list = pygame.sprite.Group()
         self.all_sprites_list = pygame.sprite.Group()
+
+        # Create play field borders
+        self.ceiling = Ceiling()
+        self.left_wall = Wall(150)
+        self.right_wall = Wall(550)
+        self.all_sprites_list.add(self.ceiling)
+        self.all_sprites_list.add(self.left_wall)
+        self.all_sprites_list.add(self.right_wall)
 
         # Create the arrow
         self.arrow = Arrow()
@@ -187,6 +221,13 @@ class Game(object):
         if not self.game_over:
             # Move all the sprites
             self.all_sprites_list.update()
+
+        if pygame.sprite.collide_rect(self.left_wall, self.bubble)\
+                or pygame.sprite.collide_rect(self.bubble, self.right_wall):
+            self.bubble.x_change *= -1
+        if pygame.sprite.collide_rect(self.ceiling, self.bubble):
+            self.bubble.y_change *= -1
+
 
     def display_frame(self, screen):
         """ Display everything to the screen for the game. """
