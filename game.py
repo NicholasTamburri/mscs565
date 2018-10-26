@@ -79,7 +79,7 @@ class Arrow(pygame.sprite.Sprite):
 
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a bubble. """
-    RADIUS = 10
+    RADIUS = 16
     DIAMETER = RADIUS * 2
 
     def __init__(self, centerx, centery):
@@ -200,12 +200,24 @@ class Game(object):
 
         # Create some board bubbles
         for x in range(8):
-            x_pos = self.left_wall.rect.right + Bubble.RADIUS + x * Bubble.DIAMETER
+            x_pos = self.left_wall.rect.right + Bubble.RADIUS\
+                    + x * Bubble.DIAMETER
             for y in range(11):
-                y_pos = self.ceiling.rect.bottom + Bubble.RADIUS + y * Bubble.DIAMETER
-                bubble = Bubble(x_pos, y_pos)
-                self.bubble_list.add(bubble)
-                self.all_sprites_list.add(bubble)
+                # Some math to find vertical spacing of the bubbles
+                distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
+                space = distance - Bubble.DIAMETER
+                y_space = math.sqrt(4 / 5 * space ** 2)
+
+                y_pos = self.ceiling.rect.bottom + Bubble.RADIUS\
+                        + y * (Bubble.DIAMETER - space - y_space)
+                if y % 2 == 1:
+                    x_pos += Bubble.RADIUS
+                elif y > 0:
+                    x_pos -= Bubble.RADIUS
+                if x != 7 or y % 2 == 0:
+                    bubble = Bubble(x_pos, y_pos)
+                    self.bubble_list.add(bubble)
+                    self.all_sprites_list.add(bubble)
 
         # Create the player's bubble
         self.bubble = PlayerBubble(self.arrow.rect.centerx,
