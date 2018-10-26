@@ -363,9 +363,9 @@ class Game(object):
             if abs(y_diff) < Bubble.RADIUS:
                 new_y = bubble_hit.rect.centery
             elif y_diff < 0:
-                new_y = bubble_hit.rect.centery - Game.Y_SPACE
+                new_y = bubble_hit.rect.centery - Bubble.DIAMETER + Game.Y_SPACE
             else:
-                new_y = bubble_hit.rect.centery + Game.Y_SPACE
+                new_y = bubble_hit.rect.centery + Bubble.DIAMETER - Game.Y_SPACE
 
             new_x = 0
             if new_y == bubble_hit.rect.centery:
@@ -377,7 +377,7 @@ class Game(object):
                 if x_diff > 0:
                     new_x = bubble_hit.rect.centerx + Bubble.RADIUS
                 else:
-                    new_x = bubble_hit.rect.centerx + Bubble.RADIUS
+                    new_x = bubble_hit.rect.centerx - Bubble.RADIUS
 
             new_bubble = Bubble(new_x, new_y, self.bubble.color)
             self.board_bubble_list.add(new_bubble)
