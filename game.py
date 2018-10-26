@@ -144,11 +144,11 @@ class Ceiling(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.image = pygame.Surface([400, 1])
+        self.image = pygame.Surface([8 * 2 * Bubble.RADIUS, 1])
         self.image.fill(BLACK)
 
         self.rect = self.image.get_rect()
-        self.rect.x = 150
+        self.rect.x = SCREEN_WIDTH / 2 - 4 * 2 * Bubble.RADIUS
         self.rect.y = 50
 
 
@@ -187,8 +187,8 @@ class Game(object):
 
         # Create play field borders
         self.ceiling = Ceiling()
-        self.left_wall = Wall(150)
-        self.right_wall = Wall(550)
+        self.left_wall = Wall(SCREEN_WIDTH / 2 - 4 * 2 * Bubble.RADIUS)
+        self.right_wall = Wall(SCREEN_WIDTH / 2 + 4 * 2 * Bubble.RADIUS)
         self.all_sprites_list.add(self.ceiling)
         self.all_sprites_list.add(self.left_wall)
         self.all_sprites_list.add(self.right_wall)
@@ -198,12 +198,11 @@ class Game(object):
         self.all_sprites_list.add(self.arrow)
 
         # Create some board bubbles
-        for i in range(10):
+        for i in range(8):
             bubble = Bubble(self.left_wall.rect.right + Bubble.RADIUS + 2 * i * Bubble.RADIUS,
                             self.ceiling.rect.bottom + Bubble.RADIUS)
             self.bubble_list.add(bubble)
             self.all_sprites_list.add(bubble)
-
 
         # Create the player's bubble
         self.bubble = PlayerBubble(self.arrow.rect.centerx,
