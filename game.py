@@ -92,6 +92,8 @@ class Bubble(pygame.sprite.Sprite):
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
 
+        self.color = color
+
         pygame.draw.circle(self.image, color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
         self.rect = self.image.get_rect()
         self.rect.centerx = centerx
@@ -186,6 +188,13 @@ class Game(object):
     """ This class represents an instance of the game. If we need to
         reset the game we'd just need to create a new instance of this
         class. """
+    # Some math to find vertical spacing of the bubbles
+    Y_SPACE = math.sqrt(4 / 5 * (
+            math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)\
+            - Bubble.DIAMETER\
+        ) ** 2)\
+        + math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)\
+            - Bubble.DIAMETER\
 
     def __init__(self):
         """ Constructor. Create all our attributes and initialize
@@ -199,6 +208,7 @@ class Game(object):
         self.k_right_is_pressed = False
 
         # Create sprite lists
+        self.board_bubble_list = pygame.sprite.Group()
         self.bubble_list = pygame.sprite.Group()
         self.all_sprites_list = pygame.sprite.Group()
 
@@ -221,12 +231,12 @@ class Game(object):
                     + column * Bubble.DIAMETER
             for row in range(11):
                 # Some math to find vertical spacing of the bubbles
-                distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
-                space = distance - Bubble.DIAMETER
-                y_space = math.sqrt(4 / 5 * space ** 2)
+                # distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
+                # space = distance - Bubble.DIAMETER
+                # y_space = math.sqrt(4 / 5 * space ** 2)
 
                 y_pos = self.ceiling.rect.bottom + Bubble.RADIUS \
-                        + row * (Bubble.DIAMETER - space - y_space)
+                        + row * (Bubble.DIAMETER - Game.Y_SPACE)
                 if row % 2 == 1:
                     x_pos += Bubble.RADIUS
                 elif row > 0:
@@ -236,12 +246,14 @@ class Game(object):
                     if row == 0:
                         # Add the bubble
                         bubble = Bubble(x_pos, y_pos, RED)
+                        self.board_bubble_list.add(bubble)
                         self.bubble_list.add(bubble)
                         self.all_sprites_list.add(bubble)
                     if row == 1:
                         if column != 3:
                             # Add the bubble
                             bubble = Bubble(x_pos, y_pos, ORANGE)
+                            self.board_bubble_list.add(bubble)
                             self.bubble_list.add(bubble)
                             self.all_sprites_list.add(bubble)
                     if row == 2:
@@ -251,6 +263,7 @@ class Game(object):
                                 or column == 6:
                             # Add the bubble
                             bubble = Bubble(x_pos, y_pos, YELLOW)
+                            self.board_bubble_list.add(bubble)
                             self.bubble_list.add(bubble)
                             self.all_sprites_list.add(bubble)
                     if row == 3:
@@ -258,6 +271,7 @@ class Game(object):
                                 or column == 5:
                             # Add the bubble
                             bubble = Bubble(x_pos, y_pos, GREEN)
+                            self.board_bubble_list.add(bubble)
                             self.bubble_list.add(bubble)
                             self.all_sprites_list.add(bubble)
 
@@ -338,6 +352,39 @@ class Game(object):
             self.arrow.change_angle = 1
         elif self.k_right_is_pressed:
             self.arrow.change_angle = -1
+
+        # Handle collision with board bubble
+        bubble_hit = pygame.sprite.spritecollideany(self.bubble, self.board_bubble_list)
+        if bubble_hit:
+            x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
+            y_diff = self.bubble.rect.centery - bubble_hit.rect.centery
+
+            new_y = 0
+            if abs(y_diff) < Bubble.RADIUS:
+                new_y = bubble_hit.rect.centery
+            elif y_diff < 0:
+                new_y = bubble_hit.rect.centery - Game.Y_SPACE
+            else:
+                new_y = bubble_hit.rect.centery + Game.Y_SPACE
+
+            new_x = 0
+            if new_y == bubble_hit.rect.centery:
+                if x_diff > 0:
+                    new_x = bubble_hit.rect.centerx + Bubble.DIAMETER
+                else:
+                    new_x = bubble_hit.rect.centerx - Bubble.DIAMETER
+            else:
+                if x_diff > 0:
+                    new_x = bubble_hit.rect.centerx + Bubble.RADIUS
+                else:
+                    new_x = bubble_hit.rect.centerx + Bubble.RADIUS
+
+            new_bubble = Bubble(new_x, new_y, self.bubble.color)
+            self.board_bubble_list.add(new_bubble)
+            self.bubble_list.add(new_bubble)
+            self.all_sprites_list.add(new_bubble)
+
+            self.bubble.reset_pos()
 
 
     def display_frame(self, screen):
