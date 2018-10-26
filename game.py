@@ -31,7 +31,7 @@ class Arrow(pygame.sprite.Sprite):
     WIDTH = 12
 
     HOME_X = SCREEN_WIDTH / 2 - 1
-    HOME_Y = SCREEN_HEIGHT - 101
+    HOME_Y = SCREEN_HEIGHT - 51
 
     BASE_IMAGE = pygame.Surface([WIDTH + 1, LENGTH])
 
@@ -39,6 +39,8 @@ class Arrow(pygame.sprite.Sprite):
         super().__init__()
         self.image = Arrow.BASE_IMAGE
         self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE)
+
         pygame.draw.line(self.image, BLACK,
                          [Arrow.WIDTH / 2, 0],
                          [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2])
@@ -83,6 +85,8 @@ class Bubble(pygame.sprite.Sprite):
         super().__init__()
         self.image = pygame.Surface([20, 20])
         self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE)
+
         pygame.draw.circle(self.image, BLACK, [10, 10], 10)
         self.rect = self.image.get_rect()
         self.rect.centerx = centerx
@@ -162,6 +166,10 @@ class Game(object):
         self.score = 0
         self.game_over = False
 
+        self.k_left_is_pressed = False
+        self.k_up_is_pressed = False
+        self.k_right_is_pressed = False
+
         # Create sprite lists
         self.bubble_list = pygame.sprite.Group()
         self.all_sprites_list = pygame.sprite.Group()
@@ -196,14 +204,19 @@ class Game(object):
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
-                    self.arrow.change_angle += 1
+                    self.k_left_is_pressed = True
+                if event.key == pygame.K_UP:
+                    self.k_up_is_pressed = True
                 if event.key == pygame.K_RIGHT:
-                    self.arrow.change_angle -= 1
+                    self.k_right_is_pressed = True
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
-                    self.arrow.change_angle -= 1
+                    self.k_left_is_pressed = False
+                if event.key == pygame.K_UP:
+                    self.k_up_is_pressed = False
                 if event.key == pygame.K_RIGHT:
-                    self.arrow.change_angle += 1
+                    self.k_right_is_pressed = False
 
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
                     and self.bubble.x_change == 0 and self.bubble.y_change == 0:
@@ -222,11 +235,28 @@ class Game(object):
             # Move all the sprites
             self.all_sprites_list.update()
 
+        # Bubble ricochets off walls and ceiling
         if pygame.sprite.collide_rect(self.left_wall, self.bubble)\
                 or pygame.sprite.collide_rect(self.bubble, self.right_wall):
             self.bubble.x_change *= -1
         if pygame.sprite.collide_rect(self.ceiling, self.bubble):
             self.bubble.y_change *= -1
+
+        # Handle arrow aiming
+        if self.k_up_is_pressed:
+            if self.arrow.angle > 0: # Pointing left
+                self.arrow.change_angle = -1 # Rotate right
+            if self.arrow.angle < 0: # Pointing right
+                self.arrow.change_angle = 1 # Rotate left
+            if self.arrow.angle == 0: # Pointing straight up
+                self.arrow.change_angle = 0
+        else:
+            if self.k_left_is_pressed == self.k_right_is_pressed:
+                self.arrow.change_angle = 0
+            elif self.k_left_is_pressed:
+                self.arrow.change_angle = 1
+            elif self.k_right_is_pressed:
+                self.arrow.change_angle = -1
 
 
     def display_frame(self, screen):
