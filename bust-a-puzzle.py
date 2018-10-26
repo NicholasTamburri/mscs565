@@ -425,7 +425,7 @@ def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("My Game")
+    pygame.display.set_caption("Bust-a-Puzzle v0.0.1")
 
     # Create our objects and set the data
     done = False
