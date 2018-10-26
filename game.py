@@ -229,9 +229,10 @@ class Game(object):
                 elif y > 0:
                     x_pos -= Bubble.RADIUS
                 if x != 7 or y % 2 == 0:
-                    bubble = Bubble(x_pos, y_pos)
-                    self.bubble_list.add(bubble)
-                    self.all_sprites_list.add(bubble)
+                    if x % 2 == 0:
+                        bubble = Bubble(x_pos, y_pos)
+                        self.bubble_list.add(bubble)
+                        self.all_sprites_list.add(bubble)
 
         # Create the kill line
         self.kill_line = KillLine(y_pos + Bubble.RADIUS)
