@@ -1,10 +1,15 @@
 """
 Nicholas Tamburri
-Version 0.0.1
+Bust-a-Puzzle Version 0.0.1
 
-Game code for Bust-a-Move clone.
+A board of bubbles is generated. The player controls the arrow
+at the bottom of the board, which aims and fires bubbles.
+Fired bubbles stick to the bubbles on the board.
+Game ends when a board bubble is below the kill line at the bottom.
+Neither removing board bubbles nor shifting them down have been implemented yet.
 
-Play by shooting bubbles at other bubbles.
+Play by aiming the arrow using (fittingly) the arrow keys
+and using the space bar to fire the bubble.
 """
 
 import math
@@ -196,7 +201,11 @@ class Game(object):
             - Bubble.DIAMETER\
         ) ** 2)\
         + math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)\
-            - Bubble.DIAMETER\
+            - Bubble.DIAMETER
+    # For reference, here is the math:
+    # distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
+    # space = distance - Bubble.DIAMETER
+    # y_space = math.sqrt(4 / 5 * space ** 2)
 
     def __init__(self):
         """ Constructor. Create all our attributes and initialize
@@ -232,11 +241,6 @@ class Game(object):
             x_pos = self.left_wall.rect.right + Bubble.RADIUS \
                     + column * Bubble.DIAMETER
             for row in range(11):
-                # Some math to find vertical spacing of the bubbles
-                # distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
-                # space = distance - Bubble.DIAMETER
-                # y_space = math.sqrt(4 / 5 * space ** 2)
-
                 y_pos = self.ceiling.rect.bottom + Bubble.RADIUS \
                         + row * (Bubble.DIAMETER - Game.Y_SPACE)
                 if row % 2 == 1:
