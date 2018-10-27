@@ -363,7 +363,7 @@ class Game(object):
         bubble_hit = pygame.sprite.spritecollideany(
             self.bubble, self.board_bubble_list, pygame.sprite.collide_circle
         )
-        if bubble_hit:
+        if bubble_hit and bubble_hit.color != self.bubble.color:
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery
 
@@ -399,6 +399,9 @@ class Game(object):
             # End game if the new bubble is below the kill line
             if new_bubble.rect.centery > self.kill_line.rect.y:
                 self.game_over = True
+        if bubble_hit and bubble_hit.color == self.bubble.color:
+            bubble_hit.kill()
+            self.bubble.reset_pos()
 
 
     def display_frame(self, screen):
