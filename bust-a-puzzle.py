@@ -360,7 +360,9 @@ class Game(object):
             self.arrow.change_angle = -1
 
         # Handle collision with board bubble
-        bubble_hit = pygame.sprite.spritecollideany(self.bubble, self.board_bubble_list)
+        bubble_hit = pygame.sprite.spritecollideany(
+            self.bubble, self.board_bubble_list, pygame.sprite.collide_circle
+        )
         if bubble_hit:
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery
