@@ -85,13 +85,6 @@ class Arrow(pygame.sprite.Sprite):
         self.rect.centery = Arrow.HOME_Y
 
 
-class Board(object):
-    """ This class represents the game board. """
-
-    def __init__(self):
-        self.bubble_list = pygame.sprite.Group()
-
-
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a bubble. """
     RADIUS = 20
@@ -119,6 +112,14 @@ class Bubble(pygame.sprite.Sprite):
 
         self.x_change = 0
         self.y_change = 0
+
+
+class Board(object):
+    """ This class represents the game board. """
+    WIDTH = 8 * Bubble.DIAMETER - 7
+
+    def __init__(self):
+        self.bubble_list = pygame.sprite.Group()
 
 
 class PlayerBubble(Bubble):
@@ -162,19 +163,48 @@ class BoardBubble(Bubble):
         super().__init__(centerx, centery, color)
         self.fired = fired
 
-        self.adjacent_bubble_list = pygame.sprite.spritecollide(
-            self, board.bubble_list, False
+
+        self.adjacent_bubble_list = pygame.sprite.Group(
+            pygame.sprite.spritecollide(
+                self, board.bubble_list, False
+            )
         )
-        board.bubble_list.add(self)
-        self.connected_bubble_list = pygame.sprite.Group()
-        self.connected_same_color_bubble_list = pygame.sprite.Group()
-
         for bubble in self.adjacent_bubble_list:
-            self.connected_bubble_list.add(bubble.connected_bubble_list.sprites())
+            bubble.adjacent_bubble_list.add(self)
 
+        self.connected_bubble_list = pygame.sprite.Group(self.adjacent_bubble_list)
         for bubble in self.connected_bubble_list:
-            if self.color == bubble.color:
-                self.connected_same_color_bubble_list.add(bubble)
+            self.connected_bubble_list.add(bubble.connected_bubble_list)
+            for bubble in self.connected_bubble_list:
+                self.connected_bubble_list.add(bubble.connected_bubble_list)
+                bubble.connected_bubble_list.add(self)
+            bubble.connected_bubble_list.add(self)
+        self.connected_bubble_list.add(self)
+        # Theoretically the bubble would not need to be considered connected
+        # to itself, so the above line is just for consistency as sometimes
+        # the bubble ends up in the list anyway.
+
+        # for bubble in self.connected_bubble_list:
+        #     for bub in bubble.connected_bubble_list:
+        #         bub.connected_bubble_list.add(self, bubble)
+
+        # self.connected_same_color_bubble_list = pygame.sprite.Group()
+
+        board.bubble_list.add(self)
+
+        # self.connected_bubble_list.add(self.adjacent_bubble_list)
+
+        # for bubble in self.connected_bubble_list:
+        #     bubble.connected_bubble_list.add(self.connected_bubble_list)
+        #     for bub in bubble.connected_bubble_list:
+        #         self.connected_bubble_list.add(bub.connected_bubble_list)
+
+        # for bubble in self.adjacent_bubble_list:
+        #     self.connected_bubble_list.add(bubble.connected_bubble_list)
+
+        # for bubble in self.connected_bubble_list:
+        #     if self.color == bubble.color:
+        #         self.connected_same_color_bubble_list.add(bubble)
 
 
 class Ceiling(pygame.sprite.Sprite):
@@ -182,7 +212,7 @@ class Ceiling(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.image = pygame.Surface([8 * Bubble.DIAMETER, 1])
+        self.image = pygame.Surface([Board.WIDTH + 1, 1])
         self.image.fill(BLACK)
 
         self.rect = self.image.get_rect()
@@ -208,7 +238,7 @@ class KillLine(pygame.sprite.Sprite):
     def __init__(self, y):
         super().__init__()
 
-        self.image = pygame.Surface([8 * Bubble.DIAMETER, 1])
+        self.image = pygame.Surface([Board.WIDTH + 1, 1])
         self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -254,7 +284,7 @@ class Game(object):
         # Create play field borders
         self.ceiling = Ceiling()
         self.left_wall = Wall(SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER)
-        self.right_wall = Wall(SCREEN_WIDTH / 2 + 4 * Bubble.DIAMETER)
+        self.right_wall = Wall(SCREEN_WIDTH / 2 + 4 * Bubble.DIAMETER - 6)
         self.all_sprites_list.add(self.ceiling)
         self.all_sprites_list.add(self.left_wall)
         self.all_sprites_list.add(self.right_wall)
@@ -267,7 +297,7 @@ class Game(object):
         y_pos = 0
         for column in range(8):
             x_pos = self.left_wall.rect.right + Bubble.RADIUS \
-                    + column * Bubble.DIAMETER
+                    + column * (Bubble.DIAMETER - 1)
             for row in range(11):
                 y_pos = self.ceiling.rect.bottom + Bubble.RADIUS \
                         + row * (Bubble.DIAMETER - Game.Y_SPACE)
@@ -330,6 +360,22 @@ class Game(object):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if self.game_over:
                     self.__init__()
+                else:
+                    # Debug stuff
+                    point = pygame.sprite.Sprite()
+                    pos = pygame.mouse.get_pos()
+                    point.image = pygame.Surface([1, 1])
+                    point.rect = point.image.get_rect()
+                    point.rect.x = pos[0]
+                    point.rect.y = pos[1]
+                    bubble = pygame.sprite.spritecollideany(point, self.board.bubble_list)
+                    if bubble:
+                        print("Adjacent: ", bubble.adjacent_bubble_list)
+                        print("Connected:", bubble.connected_bubble_list)
+                        print()
+                        if pygame.mouse.get_pressed()[2]:
+                            for bub in bubble.connected_bubble_list:
+                                bub.kill()
 
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
@@ -406,20 +452,30 @@ class Game(object):
             new_x = 0
             if new_y == bubble_hit.rect.centery:
                 if x_diff > 0:
-                    new_x = bubble_hit.rect.centerx + Bubble.DIAMETER
+                    new_x = bubble_hit.rect.centerx + Bubble.DIAMETER - 1
                 else:
-                    new_x = bubble_hit.rect.centerx - Bubble.DIAMETER
+                    new_x = bubble_hit.rect.centerx - Bubble.DIAMETER + 1
             else:
                 if x_diff > 0:
-                    new_x = bubble_hit.rect.centerx + Bubble.RADIUS
+                    new_x = bubble_hit.rect.centerx + Bubble.RADIUS - 1
                 else:
-                    new_x = bubble_hit.rect.centerx - Bubble.RADIUS
+                    new_x = bubble_hit.rect.centerx - Bubble.RADIUS + 1
 
             # Add a new bubble, based on the shot bubble, to the board
-            new_bubble = BoardBubble(new_x, new_y, self.bubble.color, self.board)
+            new_bubble = BoardBubble(new_x, new_y, self.bubble.color, self.board, True)
             self.board.bubble_list.add(new_bubble)
             self.bubble_list.add(new_bubble)
             self.all_sprites_list.add(new_bubble)
+
+            # Kill the fired bubble and those connected to it.
+            for bubble in new_bubble.connected_bubble_list:
+                bubble.kill()
+            new_bubble.kill()
+
+            # Kill the fired bubble and those adjacent to it.
+            # for bubble in new_bubble.adjacent_bubble_list:
+            #     bubble.kill()
+            # new_bubble.kill()
 
             # Ready another bubble to be fired
             self.bubble.reset_pos()
