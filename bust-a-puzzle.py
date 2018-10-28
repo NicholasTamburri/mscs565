@@ -203,25 +203,7 @@ class BoardBubble(Bubble):
                 self.connected_same_color_bubble_list.add(bub.connected_same_color_bubble_list)
                 bub.connected_same_color_bubble_list.add(self.connected_same_color_bubble_list)
 
-        # for bubble in self.adjacent_bubble_list:
-        #     if bubble.color == self.color:
-        #         self.connected_same_color_bubble_list.add(bubble)
-
         board.bubble_list.add(self)
-
-        # self.connected_bubble_list.add(self.adjacent_bubble_list)
-
-        # for bubble in self.connected_bubble_list:
-        #     bubble.connected_bubble_list.add(self.connected_bubble_list)
-        #     for bub in bubble.connected_bubble_list:
-        #         self.connected_bubble_list.add(bub.connected_bubble_list)
-
-        # for bubble in self.adjacent_bubble_list:
-        #     self.connected_bubble_list.add(bubble.connected_bubble_list)
-
-        # for bubble in self.connected_bubble_list:
-        #     if self.color == bubble.color:
-        #         self.connected_same_color_bubble_list.add(bubble)
 
 
 class Ceiling(pygame.sprite.Sprite):
@@ -488,10 +470,16 @@ class Game(object):
             self.bubble_list.add(new_bubble)
             self.all_sprites_list.add(new_bubble)
 
+            # Kill bubbles chain of bubbles the same color as the fired bubble
+            if len(new_bubble.connected_same_color_bubble_list) > 2:
+                for bubble in new_bubble.connected_same_color_bubble_list:
+                    bubble.kill()
+                new_bubble.kill()
+
             # Kill the fired bubble and those connected to it.
-            for bubble in new_bubble.connected_bubble_list:
-                bubble.kill()
-            new_bubble.kill()
+            # for bubble in new_bubble.connected_bubble_list:
+            #     bubble.kill()
+            # new_bubble.kill()
 
             # Kill the fired bubble and those adjacent to it.
             # for bubble in new_bubble.adjacent_bubble_list:
