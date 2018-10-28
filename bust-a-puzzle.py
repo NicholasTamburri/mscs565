@@ -159,6 +159,14 @@ class PlayerBubble(Bubble):
 class BoardBubble(Bubble):
     """ This class represents bubbles on the board. """
 
+    def find_connected_same_color_bubbles(self):
+        for bubble in self.adjacent_bubble_list:
+            if not self.used_bubble_list.has(bubble):
+                self.used_bubble_list.add(bubble)
+                if bubble.color == self.color:
+                    return [bubble, bubble.find_connected_same_color_bubbles()]
+        return [self]
+
     def __init__(self, centerx, centery, color, board, fired=False):
         super().__init__(centerx, centery, color)
         self.fired = fired
@@ -184,11 +192,20 @@ class BoardBubble(Bubble):
         # to itself, so the above line is just for consistency as sometimes
         # the bubble ends up in the list anyway.
 
-        # for bubble in self.connected_bubble_list:
-        #     for bub in bubble.connected_bubble_list:
-        #         bub.connected_bubble_list.add(self, bubble)
+        self.connected_same_color_bubble_list = pygame.sprite.Group()
+        self.used_bubble_list = pygame.sprite.Group()
+        self.connected_same_color_bubble_list.add(self.find_connected_same_color_bubbles())
+        self.used_bubble_list.empty()
+        for bubble in self.connected_same_color_bubble_list:
+            bubble.connected_same_color_bubble_list.add(bubble.find_connected_same_color_bubbles())
+            bubble.used_bubble_list.empty()
+            for bub in bubble.connected_same_color_bubble_list:
+                self.connected_same_color_bubble_list.add(bub.connected_same_color_bubble_list)
+                bub.connected_same_color_bubble_list.add(self.connected_same_color_bubble_list)
 
-        # self.connected_same_color_bubble_list = pygame.sprite.Group()
+        # for bubble in self.adjacent_bubble_list:
+        #     if bubble.color == self.color:
+        #         self.connected_same_color_bubble_list.add(bubble)
 
         board.bubble_list.add(self)
 
@@ -370,9 +387,13 @@ class Game(object):
                     point.rect.y = pos[1]
                     bubble = pygame.sprite.spritecollideany(point, self.board.bubble_list)
                     if bubble:
-                        print("Adjacent: ", bubble.adjacent_bubble_list)
-                        print("Connected:", bubble.connected_bubble_list)
+                        print("Adjacent:   ", bubble.adjacent_bubble_list)
+                        print("Connected:  ", bubble.connected_bubble_list)
+                        print("Color chain:", bubble.connected_same_color_bubble_list)
                         print()
+                        if pygame.mouse.get_pressed()[1]:
+                            for bub in bubble.connected_same_color_bubble_list:
+                                bub.kill()
                         if pygame.mouse.get_pressed()[2]:
                             for bub in bubble.connected_bubble_list:
                                 bub.kill()
