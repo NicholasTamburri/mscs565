@@ -423,12 +423,12 @@ class Game(object):
 
         # Handle arrow aiming
         if self.k_up_is_pressed:
-            if self.arrow.angle > 0: # Pointing left
-                self.arrow.change_angle = -1 # Rotate right
-            elif self.arrow.angle < 0: # Pointing right
-                self.arrow.change_angle = 1 # Rotate left
-            else: # Pointing straight up
-                self.arrow.change_angle = 0 # Do not rotate
+            if self.arrow.angle > 0:          # Pointing left
+                self.arrow.change_angle = -1  # Rotate right
+            elif self.arrow.angle < 0:        # Pointing right
+                self.arrow.change_angle = 1   # Rotate left
+            else:                             # Pointing straight up
+                self.arrow.change_angle = 0   # Do not rotate
         elif self.k_left_is_pressed == self.k_right_is_pressed:
             self.arrow.change_angle = 0
         elif self.k_left_is_pressed:
@@ -440,28 +440,26 @@ class Game(object):
         bubble_hit = pygame.sprite.spritecollideany(
             self.bubble, self.board.bubble_list, pygame.sprite.collide_circle
         )
-        if bubble_hit:# and bubble_hit.color != self.bubble.color:
+        if bubble_hit:
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery
 
-            new_y = 0
-            if abs(y_diff) < Bubble.RADIUS:
+            if abs(y_diff) < Bubble.RADIUS:       # Same row
                 new_y = bubble_hit.rect.centery
-            elif y_diff < 0:
+            elif y_diff < 0:                      # Above row
                 new_y = bubble_hit.rect.centery - Bubble.DIAMETER + Game.Y_SPACE
-            else:
+            else:                                 # Below row
                 new_y = bubble_hit.rect.centery + Bubble.DIAMETER - Game.Y_SPACE
 
-            new_x = 0
-            if new_y == bubble_hit.rect.centery:
-                if x_diff > 0:
+            if new_y == bubble_hit.rect.centery:  # If same row
+                if x_diff > 0:                    # Right column
                     new_x = bubble_hit.rect.centerx + Bubble.DIAMETER - 1
-                else:
+                else:                             # Left column
                     new_x = bubble_hit.rect.centerx - Bubble.DIAMETER + 1
             else:
-                if x_diff > 0:
+                if x_diff > 0:                    # Right column
                     new_x = bubble_hit.rect.centerx + Bubble.RADIUS - 1
-                else:
+                else:                             # Left column
                     new_x = bubble_hit.rect.centerx - Bubble.RADIUS + 1
 
             # Add a new bubble, based on the shot bubble, to the board
@@ -495,7 +493,6 @@ class Game(object):
         # if bubble_hit and bubble_hit.color == self.bubble.color:
         #     bubble_hit.kill()
         #     self.bubble.reset_pos()
-
 
     def display_frame(self, screen):
         """ Display everything to the screen for the game. """
