@@ -32,59 +32,6 @@ SCREEN_HEIGHT = 500
 # --- Classes ---
 
 
-class Arrow(pygame.sprite.Sprite):
-    """ The player-controlled arrow that shoots bubbles. """
-
-    LENGTH = 100
-    WIDTH = 12
-
-    HOME_X = SCREEN_WIDTH / 2 - 1
-    HOME_Y = SCREEN_HEIGHT - 51
-
-    BASE_IMAGE = pygame.Surface([WIDTH + 1, LENGTH])
-
-    def __init__(self):
-        super().__init__()
-        self.image = Arrow.BASE_IMAGE
-        self.image.fill(WHITE)
-        self.image.set_colorkey(WHITE)
-
-        pygame.draw.line(self.image, BLACK,
-                         [Arrow.WIDTH / 2, 0],
-                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2])
-        pygame.draw.line(self.image, BLACK,
-                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
-                         [1, Arrow.LENGTH])
-        pygame.draw.line(self.image, BLACK,
-                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
-                         [Arrow.WIDTH - 1, Arrow.LENGTH])
-        pygame.draw.polygon(self.image, BLACK, [
-            [Arrow.WIDTH / 2, 0],
-            [0, Arrow.WIDTH * 2],
-            [Arrow.WIDTH, Arrow.WIDTH * 2]
-        ])
-        self.rect = self.image.get_rect()
-        self.rect.centerx = Arrow.HOME_X
-        self.rect.centery = Arrow.HOME_Y
-
-        # Angle is in degrees.
-        # 0 is straight up, positive is left, negative is right
-        self.angle = 0 # degrees
-        self.change_angle = 0
-
-    def update(self):
-        self.angle += self.change_angle
-        if self.angle >= 86:
-            self.angle = 85
-        if self.angle <= -86:
-            self.angle = -85
-
-        self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
-        self.rect = self.image.get_rect()
-        self.rect.centerx = Arrow.HOME_X
-        self.rect.centery = Arrow.HOME_Y
-
-
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a bubble. """
     RADIUS = 20
@@ -119,7 +66,68 @@ class Board(object):
     WIDTH = 8 * Bubble.DIAMETER - 7
 
     def __init__(self):
+        super().__init__()
+
+        self.width = Board.WIDTH
+        self.x = SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER
+        self.y = 50
+
         self.bubble_list = pygame.sprite.Group()
+
+
+class Arrow(pygame.sprite.Sprite):
+    """ The player-controlled arrow that shoots bubbles. """
+
+    LENGTH = 100
+    WIDTH = 12
+
+    HOME_X = SCREEN_WIDTH / 2 - 1
+    HOME_Y = SCREEN_HEIGHT - 51
+
+    BASE_IMAGE = pygame.Surface([WIDTH + 1, LENGTH])
+
+    def __init__(self, board):
+        super().__init__()
+        self.image = Arrow.BASE_IMAGE
+        self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE)
+
+        self.x = board.x + board.width / 2
+
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, 0],
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2])
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
+                         [1, Arrow.LENGTH])
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
+                         [Arrow.WIDTH - 1, Arrow.LENGTH])
+        pygame.draw.polygon(self.image, BLACK, [
+            [Arrow.WIDTH / 2, 0],
+            [0, Arrow.WIDTH * 2],
+            [Arrow.WIDTH, Arrow.WIDTH * 2]
+        ])
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.x
+        self.rect.centery = Arrow.HOME_Y
+
+        # Angle is in degrees.
+        # 0 is straight up, positive is left, negative is right
+        self.angle = 0 # degrees
+        self.change_angle = 0
+
+    def update(self):
+        self.angle += self.change_angle
+        if self.angle >= 86:
+            self.angle = 85
+        if self.angle <= -86:
+            self.angle = -85
+
+        self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.x
+        self.rect.centery = Arrow.HOME_Y
 
 
 class PlayerBubble(Bubble):
@@ -127,12 +135,17 @@ class PlayerBubble(Bubble):
     # def __init__(self, centerx, centery):
     #     super().__init__(centerx, centery)
 
+    def __init__(self, centerx, centery, color, arrow):
+        super().__init__(centerx, centery, color)
+
+        self.arrow = arrow
+
     def reset_pos(self):
         """ Called when the bubble falls off the screen. """
         self.x_change = 0
         self.y_change = 0
 
-        self.rect.centerx = Arrow.HOME_X
+        self.rect.centerx = self.arrow.x
         self.rect.centery = Arrow.HOME_Y
 
         self.float_centerx = float(self.rect.centerx)
@@ -289,7 +302,7 @@ class Game(object):
         self.all_sprites_list.add(self.right_wall)
 
         # Create the arrow
-        self.arrow = Arrow()
+        self.arrow = Arrow(self.board)
         self.all_sprites_list.add(self.arrow)
 
         # Create some board bubbles
@@ -345,7 +358,8 @@ class Game(object):
         # Create the player's bubble
         self.bubble = PlayerBubble(self.arrow.rect.centerx,
                                    self.arrow.rect.centery,
-                                   BLUE)
+                                   BLUE,
+                                   self.arrow)
         self.bubble_list.add(self.bubble)
         self.all_sprites_list.add(self.bubble)
 
