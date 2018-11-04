@@ -16,6 +16,8 @@ import math
 import pygame
 import random
 
+from utils import sprite_at
+
 # --- Global constants ---
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -381,13 +383,7 @@ class Game(object):
                     self.__init__()
                 else:
                     # Debug stuff
-                    point = pygame.sprite.Sprite()
-                    pos = pygame.mouse.get_pos()
-                    point.image = pygame.Surface([1, 1])
-                    point.rect = point.image.get_rect()
-                    point.rect.x = pos[0]
-                    point.rect.y = pos[1]
-                    bubble = pygame.sprite.spritecollideany(point, self.board.bubble_list)
+                    bubble = sprite_at(pygame.mouse.get_pos(), self.board.bubble_list)
                     if bubble:
                         print("Adjacent:   ", bubble.adjacent_bubble_list)
                         print("Connected:  ", bubble.connected_bubble_list)
