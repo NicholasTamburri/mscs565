@@ -32,6 +32,84 @@ SCREEN_HEIGHT = 500
 # --- Classes ---
 
 
+class Arrow(pygame.sprite.Sprite):
+    """ The player-controlled arrow that shoots bubbles. """
+
+    LENGTH = 100
+    WIDTH = 12
+
+    # HOME_X = SCREEN_WIDTH / 2 - 1
+    HOME_Y = SCREEN_HEIGHT - 51
+
+    BASE_IMAGE = pygame.Surface([WIDTH + 1, LENGTH])
+
+    def __init__(self, centerx):
+        super().__init__()
+        self.image = Arrow.BASE_IMAGE
+        self.image.fill(WHITE)
+        self.image.set_colorkey(WHITE)
+
+        self.centerx = centerx
+
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, 0],
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2])
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
+                         [1, Arrow.LENGTH])
+        pygame.draw.line(self.image, BLACK,
+                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
+                         [Arrow.WIDTH - 1, Arrow.LENGTH])
+        pygame.draw.polygon(self.image, BLACK, [
+            [Arrow.WIDTH / 2, 0],
+            [0, Arrow.WIDTH * 2],
+            [Arrow.WIDTH, Arrow.WIDTH * 2]
+        ])
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.centerx
+        self.rect.centery = Arrow.HOME_Y
+
+        # Angle is in degrees.
+        # 0 is straight up, positive is left, negative is right
+        self.angle = 0 # degrees
+        self.change_angle = 0
+
+    def update(self):
+        self.angle += self.change_angle
+        if self.angle >= 86:
+            self.angle = 85
+        if self.angle <= -86:
+            self.angle = -85
+
+        self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = self.centerx
+        self.rect.centery = Arrow.HOME_Y
+
+
+class Board(object):
+    """ This class represents the game board. """
+    BUBBLE_RADIUS = 20
+    BUBBLE_DIAMETER = BUBBLE_RADIUS * 2
+
+    COLUMNS = 8
+    ROWS = 11
+
+    WIDTH = COLUMNS * BUBBLE_DIAMETER - COLUMNS + 1
+
+    def __init__(self):
+        super().__init__()
+
+        self.width = Board.WIDTH
+        self.x = SCREEN_WIDTH / 2 - self.width / 2
+        self.y = 50
+
+        self.columns = Board.COLUMNS
+
+        self.arrow = Arrow(self.x + self.width / 2)
+        self.bubble_list = pygame.sprite.Group()
+
+
 class Bubble(pygame.sprite.Sprite):
     """ This class represents a bubble. """
     RADIUS = 20
@@ -61,91 +139,20 @@ class Bubble(pygame.sprite.Sprite):
         self.y_change = 0
 
 
-class Board(object):
-    """ This class represents the game board. """
-    WIDTH = 8 * Bubble.DIAMETER - 7
-
-    def __init__(self):
-        super().__init__()
-
-        self.width = Board.WIDTH
-        self.x = SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER
-        self.y = 50
-
-        self.bubble_list = pygame.sprite.Group()
-
-
-class Arrow(pygame.sprite.Sprite):
-    """ The player-controlled arrow that shoots bubbles. """
-
-    LENGTH = 100
-    WIDTH = 12
-
-    HOME_X = SCREEN_WIDTH / 2 - 1
-    HOME_Y = SCREEN_HEIGHT - 51
-
-    BASE_IMAGE = pygame.Surface([WIDTH + 1, LENGTH])
-
-    def __init__(self, board):
-        super().__init__()
-        self.image = Arrow.BASE_IMAGE
-        self.image.fill(WHITE)
-        self.image.set_colorkey(WHITE)
-
-        self.x = board.x + board.width / 2
-
-        pygame.draw.line(self.image, BLACK,
-                         [Arrow.WIDTH / 2, 0],
-                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2])
-        pygame.draw.line(self.image, BLACK,
-                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
-                         [1, Arrow.LENGTH])
-        pygame.draw.line(self.image, BLACK,
-                         [Arrow.WIDTH / 2, Arrow.LENGTH - Arrow.WIDTH * 3 / 2],
-                         [Arrow.WIDTH - 1, Arrow.LENGTH])
-        pygame.draw.polygon(self.image, BLACK, [
-            [Arrow.WIDTH / 2, 0],
-            [0, Arrow.WIDTH * 2],
-            [Arrow.WIDTH, Arrow.WIDTH * 2]
-        ])
-        self.rect = self.image.get_rect()
-        self.rect.centerx = self.x
-        self.rect.centery = Arrow.HOME_Y
-
-        # Angle is in degrees.
-        # 0 is straight up, positive is left, negative is right
-        self.angle = 0 # degrees
-        self.change_angle = 0
-
-    def update(self):
-        self.angle += self.change_angle
-        if self.angle >= 86:
-            self.angle = 85
-        if self.angle <= -86:
-            self.angle = -85
-
-        self.image = pygame.transform.rotate(Arrow.BASE_IMAGE, self.angle)
-        self.rect = self.image.get_rect()
-        self.rect.centerx = self.x
-        self.rect.centery = Arrow.HOME_Y
-
-
 class PlayerBubble(Bubble):
     """ This class represents the bubble that the player shoots. """
-    # def __init__(self, centerx, centery):
-    #     super().__init__(centerx, centery)
 
-    def __init__(self, centerx, centery, color, arrow):
+    def __init__(self, centerx, centery, color, board):
         super().__init__(centerx, centery, color)
 
-        self.arrow = arrow
+        self.arrow = board.arrow
 
     def reset_pos(self):
         """ Called when the bubble falls off the screen. """
         self.x_change = 0
         self.y_change = 0
 
-        self.rect.centerx = self.arrow.x
+        self.rect.centerx = self.arrow.centerx
         self.rect.centery = Arrow.HOME_Y
 
         self.float_centerx = float(self.rect.centerx)
@@ -183,7 +190,6 @@ class BoardBubble(Bubble):
     def __init__(self, centerx, centery, color, board, fired=False):
         super().__init__(centerx, centery, color)
         self.fired = fired
-
 
         self.adjacent_bubble_list = pygame.sprite.Group(
             pygame.sprite.spritecollide(
@@ -285,7 +291,7 @@ class Game(object):
         self.k_up_is_pressed = False
         self.k_right_is_pressed = False
 
-        # Create game board
+        # Create game board, which also creates arrow
         self.board = Board()
 
         # Create sprite lists
@@ -302,8 +308,8 @@ class Game(object):
         self.all_sprites_list.add(self.right_wall)
 
         # Create the arrow
-        self.arrow = Arrow(self.board)
-        self.all_sprites_list.add(self.arrow)
+        # self.arrow = Arrow(self.board)
+        self.all_sprites_list.add(self.board.arrow)
 
         # Create some board bubbles
         y_pos = 0
@@ -356,10 +362,10 @@ class Game(object):
         self.all_sprites_list.add(self.kill_line)
 
         # Create the player's bubble
-        self.bubble = PlayerBubble(self.arrow.rect.centerx,
-                                   self.arrow.rect.centery,
+        self.bubble = PlayerBubble(self.board.arrow.rect.centerx,
+                                   self.board.arrow.rect.centery,
                                    BLUE,
-                                   self.arrow)
+                                   self.board)
         self.bubble_list.add(self.bubble)
         self.all_sprites_list.add(self.bubble)
 
@@ -413,7 +419,7 @@ class Game(object):
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
                     and self.bubble.x_change == 0 and self.bubble.y_change == 0:
                 speed = 8
-                angle = math.radians(self.arrow.angle - 90)
+                angle = math.radians(self.board.arrow.angle - 90)
                 self.bubble.x_change = -math.cos(angle) * speed
                 self.bubble.y_change = math.sin(angle) * speed
 
@@ -437,18 +443,18 @@ class Game(object):
 
         # Handle arrow aiming
         if self.k_up_is_pressed:
-            if self.arrow.angle > 0:          # Pointing left
-                self.arrow.change_angle = -1  # Rotate right
-            elif self.arrow.angle < 0:        # Pointing right
-                self.arrow.change_angle = 1   # Rotate left
+            if self.board.arrow.angle > 0:          # Pointing left
+                self.board.arrow.change_angle = -1  # Rotate right
+            elif self.board.arrow.angle < 0:        # Pointing right
+                self.board.arrow.change_angle = 1   # Rotate left
             else:                             # Pointing straight up
-                self.arrow.change_angle = 0   # Do not rotate
+                self.board.arrow.change_angle = 0   # Do not rotate
         elif self.k_left_is_pressed == self.k_right_is_pressed:
-            self.arrow.change_angle = 0
+            self.board.arrow.change_angle = 0
         elif self.k_left_is_pressed:
-            self.arrow.change_angle = 1
+            self.board.arrow.change_angle = 1
         elif self.k_right_is_pressed:
-            self.arrow.change_angle = -1
+            self.board.arrow.change_angle = -1
 
         # Handle collision with board bubble
         bubble_hit = pygame.sprite.spritecollideany(
