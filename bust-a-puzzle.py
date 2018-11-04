@@ -481,14 +481,14 @@ class Game(object):
 
             if new_y == bubble_hit.rect.centery:  # If same row
                 if x_diff > 0:                    # Right column
-                    new_x = bubble_hit.rect.centerx + self.board.bubble_diameter - 1
+                    new_x = bubble_hit.rect.centerx + self.board.bubble_diameter
                 else:                             # Left column
-                    new_x = bubble_hit.rect.centerx - self.board.bubble_diameter + 1
+                    new_x = bubble_hit.rect.centerx - self.board.bubble_diameter
             else:
                 if x_diff > 0:                    # Right column
-                    new_x = bubble_hit.rect.centerx + self.board.bubble_radius - 1
+                    new_x = bubble_hit.rect.centerx + self.board.bubble_radius
                 else:                             # Left column
-                    new_x = bubble_hit.rect.centerx - self.board.bubble_radius + 1
+                    new_x = bubble_hit.rect.centerx - self.board.bubble_radius
 
             # Add a new bubble, based on the shot bubble, to the board
             new_bubble = BoardBubble(new_x, new_y, self.bubble.color, self.board, True)
