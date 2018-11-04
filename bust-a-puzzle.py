@@ -89,6 +89,45 @@ class Arrow(pygame.sprite.Sprite):
         self.rect.centery = Arrow.HOME_Y
 
 
+class Ceiling(pygame.sprite.Sprite):
+    """ Top border of the play field. """
+    def __init__(self, board):
+        super().__init__()
+
+        self.image = pygame.Surface([board.width + 1, 1])
+        self.image.fill(BLACK)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = board.x
+        self.rect.y = board.y
+
+
+class Wall(pygame.sprite.Sprite):
+    """ Left and right borders of the play field. """
+    def __init__(self, x, board):
+        super().__init__()
+
+        self.image = pygame.Surface([1, SCREEN_HEIGHT])
+        self.image.fill(BLACK)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = board.y
+
+
+class KillLine(pygame.sprite.Sprite):
+    """ Game over when board bubbles cross this line. """
+    def __init__(self, y, board):
+        super().__init__()
+
+        self.image = pygame.Surface([board.width + 1, 1])
+        self.image.fill(RED)
+
+        self.rect = self.image.get_rect()
+        self.rect.x = board.x
+        self.rect.y = y
+
+
 class Board(object):
     """ This class represents the game board. """
     BUBBLE_RADIUS = 20
@@ -98,6 +137,18 @@ class Board(object):
     ROWS = 11
 
     WIDTH = COLUMNS * BUBBLE_DIAMETER
+
+    # Some math to find vertical spacing of the bubbles
+    Y_SPACE = math.sqrt(4 / 5 * (
+            math.sqrt(BUBBLE_RADIUS ** 2 + BUBBLE_DIAMETER ** 2) \
+            - BUBBLE_DIAMETER \
+        ) ** 2) \
+              + math.sqrt(BUBBLE_RADIUS ** 2 + BUBBLE_DIAMETER ** 2) \
+              - BUBBLE_DIAMETER
+    # For reference, here is the math:
+    # distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
+    # space = distance - Bubble.DIAMETER
+    # y_space = math.sqrt(4 / 5 * space ** 2)
 
     def __init__(self):
         super().__init__()
@@ -110,9 +161,18 @@ class Board(object):
         self.y = 50
 
         self.columns = Board.COLUMNS
+        self.rows = Board.ROWS
+        self.y_space = Board.Y_SPACE
 
         self.arrow = Arrow(self.x + self.width / 2 + 1)
         self.bubble_list = pygame.sprite.Group()
+
+        self.ceiling = Ceiling(self)
+        self.left_wall = Wall(self.x, self)
+        self.right_wall = Wall(self.x + self.width, self)
+
+        kill_line_y = self.y + self.rows * (self.bubble_diameter - self.y_space) + self.y_space
+        self.kill_line = KillLine(kill_line_y, self)
 
 
 class Bubble(pygame.sprite.Sprite):
@@ -229,60 +289,10 @@ class BoardBubble(Bubble):
         board.bubble_list.add(self)
 
 
-class Ceiling(pygame.sprite.Sprite):
-    """ Top border of the play field. """
-    def __init__(self, board):
-        super().__init__()
-
-        self.image = pygame.Surface([board.width + 1, 1])
-        self.image.fill(BLACK)
-
-        self.rect = self.image.get_rect()
-        self.rect.x = SCREEN_WIDTH / 2 - 4 * board.bubble_diameter
-        self.rect.y = 50
-
-
-class Wall(pygame.sprite.Sprite):
-    """ Left and right borders of the play field. """
-    def __init__(self, x):
-        super().__init__()
-
-        self.image = pygame.Surface([1, SCREEN_HEIGHT])
-        self.image.fill(BLACK)
-
-        self.rect = self.image.get_rect()
-        self.rect.x = x
-        self.rect.y = 50
-
-
-class KillLine(pygame.sprite.Sprite):
-    """ Game over when board bubbles cross this line. """
-    def __init__(self, y, board):
-        super().__init__()
-
-        self.image = pygame.Surface([board.width + 1, 1])
-        self.image.fill(RED)
-
-        self.rect = self.image.get_rect()
-        self.rect.x = SCREEN_WIDTH / 2 - 4 * board.bubble_diameter
-        self.rect.y = y
-
-
 class Game(object):
     """ This class represents an instance of the game. If we need to
         reset the game we'd just need to create a new instance of this
         class. """
-    # Some math to find vertical spacing of the bubbles
-    Y_SPACE = math.sqrt(4 / 5 * (
-            math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)\
-            - Bubble.DIAMETER\
-        ) ** 2)\
-        + math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)\
-            - Bubble.DIAMETER
-    # For reference, here is the math:
-    # distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
-    # space = distance - Bubble.DIAMETER
-    # y_space = math.sqrt(4 / 5 * space ** 2)
 
     def __init__(self):
         """ Constructor. Create all our attributes and initialize
@@ -304,12 +314,12 @@ class Game(object):
         self.all_sprites_list = pygame.sprite.Group()
 
         # Create play field borders
-        self.ceiling = Ceiling(self.board)
-        self.left_wall = Wall(SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER)
-        self.right_wall = Wall(SCREEN_WIDTH / 2 + 4 * Bubble.DIAMETER)
-        self.all_sprites_list.add(self.ceiling)
-        self.all_sprites_list.add(self.left_wall)
-        self.all_sprites_list.add(self.right_wall)
+        # self.ceiling = Ceiling(self.board)
+        # self.left_wall = Wall(SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER)
+        # self.right_wall = Wall(SCREEN_WIDTH / 2 + 4 * Bubble.DIAMETER)
+        self.all_sprites_list.add(self.board.ceiling)
+        self.all_sprites_list.add(self.board.left_wall)
+        self.all_sprites_list.add(self.board.right_wall)
 
         # Create the arrow
         # self.arrow = Arrow(self.board)
@@ -318,15 +328,15 @@ class Game(object):
         # Create some board bubbles
         y_pos = 0
         for column in range(8):
-            x_pos = self.left_wall.rect.right + Bubble.RADIUS \
-                    + column * (Bubble.DIAMETER)
+            x_pos = self.board.left_wall.rect.right + self.board.bubble_radius \
+                    + column * (self.board.bubble_diameter)
             for row in range(11):
-                y_pos = self.ceiling.rect.bottom + Bubble.RADIUS \
-                        + row * (Bubble.DIAMETER - Game.Y_SPACE)
+                y_pos = self.board.ceiling.rect.bottom + self.board.bubble_radius \
+                        + row * (self.board.bubble_diameter - self.board.y_space)
                 if row % 2 == 1:
-                    x_pos += Bubble.RADIUS
+                    x_pos += self.board.bubble_radius
                 elif row > 0:
-                    x_pos -= Bubble.RADIUS
+                    x_pos -= self.board.bubble_radius
                 if column != 7 or row % 2 == 0:
                     # These lines represent the board pattern
                     if row == 0:
@@ -362,8 +372,8 @@ class Game(object):
                             self.all_sprites_list.add(bubble)
 
         # Create the kill line
-        self.kill_line = KillLine(y_pos + Bubble.RADIUS, self.board)
-        self.all_sprites_list.add(self.kill_line)
+        # self.kill_line = KillLine(y_pos + Bubble.RADIUS, self.board)
+        self.all_sprites_list.add(self.board.kill_line)
 
         # Create the player's bubble
         self.bubble = PlayerBubble(self.board.arrow.rect.centerx,
@@ -433,10 +443,10 @@ class Game(object):
             self.all_sprites_list.update()
 
         # Bubble ricochets off walls and ceiling
-        if pygame.sprite.collide_rect(self.left_wall, self.bubble)\
-                or pygame.sprite.collide_rect(self.bubble, self.right_wall):
+        if pygame.sprite.collide_rect(self.board.left_wall, self.bubble)\
+                or pygame.sprite.collide_rect(self.bubble, self.board.right_wall):
             self.bubble.x_change *= -1
-        if pygame.sprite.collide_rect(self.ceiling, self.bubble):
+        if pygame.sprite.collide_rect(self.board.ceiling, self.bubble):
             self.bubble.y_change *= -1
 
         # Handle arrow aiming
@@ -462,23 +472,23 @@ class Game(object):
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery
 
-            if abs(y_diff) < Bubble.RADIUS:       # Same row
+            if abs(y_diff) < self.board.bubble_radius:  # Same row
                 new_y = bubble_hit.rect.centery
-            elif y_diff < 0:                      # Above row
-                new_y = bubble_hit.rect.centery - Bubble.DIAMETER + Game.Y_SPACE
-            else:                                 # Below row
-                new_y = bubble_hit.rect.centery + Bubble.DIAMETER - Game.Y_SPACE
+            elif y_diff < 0:                            # Above row
+                new_y = bubble_hit.rect.centery - self.board.bubble_diameter + self.board.y_space
+            else:                                       # Below row
+                new_y = bubble_hit.rect.centery + self.board.bubble_diameter - self.board.y_space
 
             if new_y == bubble_hit.rect.centery:  # If same row
                 if x_diff > 0:                    # Right column
-                    new_x = bubble_hit.rect.centerx + Bubble.DIAMETER - 1
+                    new_x = bubble_hit.rect.centerx + self.board.bubble_diameter - 1
                 else:                             # Left column
-                    new_x = bubble_hit.rect.centerx - Bubble.DIAMETER + 1
+                    new_x = bubble_hit.rect.centerx - self.board.bubble_diameter + 1
             else:
                 if x_diff > 0:                    # Right column
-                    new_x = bubble_hit.rect.centerx + Bubble.RADIUS - 1
+                    new_x = bubble_hit.rect.centerx + self.board.bubble_radius - 1
                 else:                             # Left column
-                    new_x = bubble_hit.rect.centerx - Bubble.RADIUS + 1
+                    new_x = bubble_hit.rect.centerx - self.board.bubble_radius + 1
 
             # Add a new bubble, based on the shot bubble, to the board
             new_bubble = BoardBubble(new_x, new_y, self.bubble.color, self.board, True)
@@ -487,10 +497,10 @@ class Game(object):
             self.all_sprites_list.add(new_bubble)
 
             # Kill bubbles chain of bubbles the same color as the fired bubble
-            if len(new_bubble.connected_same_color_bubble_list) > 2:
-                for bubble in new_bubble.connected_same_color_bubble_list:
-                    bubble.kill()
-                new_bubble.kill()
+            # if len(new_bubble.connected_same_color_bubble_list) > 2:
+            #     for bubble in new_bubble.connected_same_color_bubble_list:
+            #         bubble.kill()
+            #     new_bubble.kill()
 
             # Kill the fired bubble and those connected to it.
             # for bubble in new_bubble.connected_bubble_list:
@@ -506,7 +516,7 @@ class Game(object):
             self.bubble.reset_pos()
 
             # End game if the new bubble is below the kill line
-            if new_bubble.rect.centery > self.kill_line.rect.y:
+            if new_bubble.rect.centery > self.board.kill_line.rect.y:
                 self.game_over = True
         # if bubble_hit and bubble_hit.color == self.bubble.color:
         #     bubble_hit.kill()
