@@ -102,6 +102,9 @@ class Board(object):
     def __init__(self):
         super().__init__()
 
+        self.bubble_radius = Board.BUBBLE_RADIUS
+        self.bubble_diameter = Board.BUBBLE_DIAMETER
+
         self.width = Board.WIDTH
         self.x = SCREEN_WIDTH / 2 - self.width / 2
         self.y = 50
@@ -193,13 +196,19 @@ class BoardBubble(Bubble):
         super().__init__(centerx, centery, color)
         self.fired = fired
 
-        self.adjacent_bubble_list = pygame.sprite.Group(
-            pygame.sprite.spritecollide(
-                self, board.bubble_list, False
-            )
-        )
-        for bubble in self.adjacent_bubble_list:
-            bubble.adjacent_bubble_list.add(self)
+        self.adjacent_bubble_list = pygame.sprite.Group()
+        for position in [
+            (centerx + board.bubble_diameter, centery),
+            (centerx + board.bubble_radius, centery - board.bubble_diameter),
+            (centerx - board.bubble_radius, centery - board.bubble_diameter),
+            (centerx - board.bubble_diameter, centery),
+            (centerx - board.bubble_radius, centery + board.bubble_diameter),
+            (centerx + board.bubble_radius, centery + board.bubble_diameter)
+        ]:
+            bubble = sprite_at(position, board.bubble_list)
+            if bubble:
+                self.adjacent_bubble_list.add(bubble)
+                bubble.adjacent_bubble_list.add(self)
 
         self.connected_bubble_list = pygame.sprite.Group(self.adjacent_bubble_list)
         for bubble in self.connected_bubble_list:
