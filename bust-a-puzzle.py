@@ -94,7 +94,7 @@ class Ceiling(pygame.sprite.Sprite):
     def __init__(self, board):
         super().__init__()
 
-        self.image = pygame.Surface([board.width + 1, 1])
+        self.image = pygame.Surface([board.width + 2, 1])
         self.image.fill(BLACK)
 
         self.rect = self.image.get_rect()
@@ -120,7 +120,7 @@ class KillLine(pygame.sprite.Sprite):
     def __init__(self, y, board):
         super().__init__()
 
-        self.image = pygame.Surface([board.width + 1, 1])
+        self.image = pygame.Surface([board.width + 2, 1])
         self.image.fill(RED)
 
         self.rect = self.image.get_rect()
@@ -169,7 +169,7 @@ class Board(object):
 
         self.ceiling = Ceiling(self)
         self.left_wall = Wall(self.x, self)
-        self.right_wall = Wall(self.x + self.width, self)
+        self.right_wall = Wall(self.x + self.width + 1, self)
 
         kill_line_y = self.y + self.rows * (self.bubble_diameter - self.y_space) + self.y_space
         self.kill_line = KillLine(kill_line_y, self)
@@ -492,6 +492,11 @@ class Game(object):
 
             # Add a new bubble, based on the shot bubble, to the board
             new_bubble = BoardBubble(new_x, new_y, self.bubble.color, self.board, True)
+            # Keep bubbles in bounds
+            if new_bubble.rect.left <= self.board.x - 1:
+                new_bubble.rect.centerx += self.board.bubble_diameter
+            elif new_bubble.rect.right >= self.board.right_wall.rect.x + 1:
+                new_bubble.rect.centerx -= self.board.bubble_diameter
             self.board.bubble_list.add(new_bubble)
             self.bubble_list.add(new_bubble)
             self.all_sprites_list.add(new_bubble)
