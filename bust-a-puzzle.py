@@ -26,6 +26,7 @@ GREEN = (0, 255, 0)
 BLUE = (0, 0, 255)
 YELLOW = (255, 255, 0)
 ORANGE = (255, 127, 0)
+GRAY = (127, 127, 127)
 
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 500
@@ -40,7 +41,6 @@ class Arrow(pygame.sprite.Sprite):
     LENGTH = 100
     WIDTH = 12
 
-    # HOME_X = SCREEN_WIDTH / 2 - 1
     HOME_Y = SCREEN_HEIGHT - 51
 
     BASE_IMAGE = pygame.Surface([WIDTH + 1, LENGTH])
@@ -326,33 +326,38 @@ class Game(object):
         self.all_sprites_list.add(self.board.arrow)
 
         # Create some board bubbles
-        y_pos = 0
         for column in range(8):
             x_pos = self.board.left_wall.rect.right + self.board.bubble_radius \
                     + column * (self.board.bubble_diameter)
-            for row in range(11):
+            for row in range(12):
                 y_pos = self.board.ceiling.rect.bottom + self.board.bubble_radius \
-                        + row * (self.board.bubble_diameter - self.board.y_space)
-                if row % 2 == 1:
+                        + (row - 1) * (self.board.bubble_diameter - self.board.y_space)
+                if row % 2 == 0:
                     x_pos += self.board.bubble_radius
                 elif row > 0:
                     x_pos -= self.board.bubble_radius
-                if column != 7 or row % 2 == 0:
+                if column != 7 or row % 2 == 1:
                     # These lines represent the board pattern
                     if row == 0:
+                        # Add node bubble
+                        node = BoardBubble(x_pos, y_pos, GRAY, self.board)
+                        self.board.bubble_list.add(node)
+                        self.bubble_list.add(node)
+                        self.all_sprites_list.add(node)
+                    if row == 1:
                         # Add the bubble
                         bubble = BoardBubble(x_pos, y_pos, RED, self.board)
                         self.board.bubble_list.add(bubble)
                         self.bubble_list.add(bubble)
                         self.all_sprites_list.add(bubble)
-                    if row == 1:
+                    if row == 2:
                         if column != 3:
                             # Add the bubble
                             bubble = BoardBubble(x_pos, y_pos, ORANGE, self.board)
                             self.board.bubble_list.add(bubble)
                             self.bubble_list.add(bubble)
                             self.all_sprites_list.add(bubble)
-                    if row == 2:
+                    if row == 3:
                         if column == 1\
                                 or column == 2\
                                 or column == 5\
@@ -362,7 +367,7 @@ class Game(object):
                             self.board.bubble_list.add(bubble)
                             self.bubble_list.add(bubble)
                             self.all_sprites_list.add(bubble)
-                    if row == 3:
+                    if row == 4:
                         if column == 1\
                                 or column == 5:
                             # Add the bubble
