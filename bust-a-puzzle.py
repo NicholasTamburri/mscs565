@@ -502,11 +502,13 @@ class Game(object):
             self.bubble_list.add(new_bubble)
             self.all_sprites_list.add(new_bubble)
 
-            # Kill bubbles chain of bubbles the same color as the fired bubble
+            # Fired bubble hits a cluster of bubbles that share its color
             if len(new_bubble.connected_same_color_bubble_list) > 2:
+                # Pop bubbles: Kill the same-colored bubbles
                 for bubble in new_bubble.connected_same_color_bubble_list:
                     bubble.kill()
                 new_bubble.kill()
+
                 # Recalculate all board bubbles' lists
                 for bubble in self.board.bubble_list:
                     bubble.adjacent_bubble_list.empty()
@@ -514,6 +516,14 @@ class Game(object):
                     bubble.connected_same_color_bubble_list.empty()
                 for bubble in self.board.bubble_list:
                     bubble.initialize_bubble_lists()
+
+                # Drop bubbles: Kill bubbles not connected to node (gray bubble)
+                for bubble in self.board.bubble_list:
+                    colors = []
+                    for connected_bubble in bubble.connected_bubble_list:
+                        colors.append(connected_bubble.color)
+                    if GRAY not in colors:
+                        bubble.kill()
 
             # Kill the fired bubble and those connected to it.
             # for bubble in new_bubble.connected_bubble_list:
