@@ -164,7 +164,7 @@ class Board(object):
         self.rows = Board.ROWS
         self.y_space = Board.Y_SPACE
 
-        self.arrow = Arrow(self.x + self.width / 2 + 1)
+        self.arrow = Arrow(self.x + self.width / 2 + 2)
         self.bubble_list = pygame.sprite.Group()
 
         self.ceiling = Ceiling(self)
@@ -244,47 +244,43 @@ class PlayerBubble(Bubble):
 class BoardBubble(Bubble):
     """ This class represents bubbles on the board. """
 
-    def __init__(self, centerx, centery, color, board, fired=False):
-        super().__init__(centerx, centery, color)
-        self.fired = fired
-
-        self.adjacent_bubble_list = pygame.sprite.Group()
+    def initialize_bubble_lists(self):
         for position in [
-            (centerx + board.bubble_diameter, centery),
-            (centerx + board.bubble_radius, centery - board.bubble_diameter),
-            (centerx - board.bubble_radius, centery - board.bubble_diameter),
-            (centerx - board.bubble_diameter, centery),
-            (centerx - board.bubble_radius, centery + board.bubble_diameter),
-            (centerx + board.bubble_radius, centery + board.bubble_diameter)
+            (self.rect.centerx + self.board.bubble_diameter, self.rect.centery),
+            (self.rect.centerx + self.board.bubble_radius, self.rect.centery - self.board.bubble_diameter),
+            (self.rect.centerx - self.board.bubble_radius, self.rect.centery - self.board.bubble_diameter),
+            (self.rect.centerx - self.board.bubble_diameter, self.rect.centery),
+            (self.rect.centerx - self.board.bubble_radius, self.rect.centery + self.board.bubble_diameter),
+            (self.rect.centerx + self.board.bubble_radius, self.rect.centery + self.board.bubble_diameter)
         ]:
-            bubble = sprite_at(position, board.bubble_list)
+            bubble = sprite_at(position, self.board.bubble_list)
             if bubble:
                 self.adjacent_bubble_list.add(bubble)
                 bubble.adjacent_bubble_list.add(self)
 
-        self.connected_bubble_list = pygame.sprite.Group(self.adjacent_bubble_list)
-        for bubble in self.connected_bubble_list:
-            self.connected_bubble_list.add(bubble.connected_bubble_list)
-            for bubble in self.connected_bubble_list:
-                self.connected_bubble_list.add(bubble.connected_bubble_list)
-                bubble.connected_bubble_list.add(self)
-            bubble.connected_bubble_list.add(self)
         self.connected_bubble_list.add(self)
-        # Theoretically the bubble would not need to be considered connected
-        # to itself, so the above line is just for consistency as sometimes
-        # the bubble ends up in the list anyway.
+        for bubble in self.adjacent_bubble_list:
+            self.connected_bubble_list.add(bubble.connected_bubble_list)
+        for bubble in self.connected_bubble_list:
+            bubble.connected_bubble_list.add(self)
 
-        self.connected_same_color_bubble_list = pygame.sprite.Group()
+        self.connected_same_color_bubble_list.add(self)
         for bubble in self.adjacent_bubble_list:
             if bubble.color == self.color:
-                self.connected_same_color_bubble_list.add(bubble)
-        for bubble in self.connected_same_color_bubble_list:
-            self.connected_same_color_bubble_list.add(bubble.connected_same_color_bubble_list)
-            for bubble in self.connected_same_color_bubble_list:
                 self.connected_same_color_bubble_list.add(bubble.connected_same_color_bubble_list)
-                bubble.connected_same_color_bubble_list.add(self)
+        for bubble in self.connected_same_color_bubble_list:
             bubble.connected_same_color_bubble_list.add(self)
-        self.connected_same_color_bubble_list.add(self)
+
+    def __init__(self, centerx, centery, color, board, fired=False):
+        super().__init__(centerx, centery, color)
+        self.board = board
+        self.fired = fired
+
+        self.adjacent_bubble_list = pygame.sprite.Group()
+        self.connected_bubble_list = pygame.sprite.Group()
+        self.connected_same_color_bubble_list = pygame.sprite.Group()
+
+        self.initialize_bubble_lists()
 
         board.bubble_list.add(self)
 
@@ -383,7 +379,7 @@ class Game(object):
         # Create the player's bubble
         self.bubble = PlayerBubble(self.board.arrow.rect.centerx,
                                    self.board.arrow.rect.centery,
-                                   BLUE,
+                                   YELLOW,
                                    self.board)
         self.bubble_list.add(self.bubble)
         self.all_sprites_list.add(self.bubble)
@@ -460,7 +456,7 @@ class Game(object):
                 self.board.arrow.change_angle = -1  # Rotate right
             elif self.board.arrow.angle < 0:        # Pointing right
                 self.board.arrow.change_angle = 1   # Rotate left
-            else:                             # Pointing straight up
+            else:                                   # Pointing straight up
                 self.board.arrow.change_angle = 0   # Do not rotate
         elif self.k_left_is_pressed == self.k_right_is_pressed:
             self.board.arrow.change_angle = 0
@@ -507,10 +503,17 @@ class Game(object):
             self.all_sprites_list.add(new_bubble)
 
             # Kill bubbles chain of bubbles the same color as the fired bubble
-            # if len(new_bubble.connected_same_color_bubble_list) > 2:
-            #     for bubble in new_bubble.connected_same_color_bubble_list:
-            #         bubble.kill()
-            #     new_bubble.kill()
+            if len(new_bubble.connected_same_color_bubble_list) > 2:
+                for bubble in new_bubble.connected_same_color_bubble_list:
+                    bubble.kill()
+                new_bubble.kill()
+                # Recalculate all board bubbles' lists
+                for bubble in self.board.bubble_list:
+                    bubble.adjacent_bubble_list.empty()
+                    bubble.connected_bubble_list.empty()
+                    bubble.connected_same_color_bubble_list.empty()
+                for bubble in self.board.bubble_list:
+                    bubble.initialize_bubble_lists()
 
             # Kill the fired bubble and those connected to it.
             # for bubble in new_bubble.connected_bubble_list:
