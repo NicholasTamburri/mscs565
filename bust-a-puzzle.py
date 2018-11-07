@@ -154,6 +154,16 @@ class Game(object):
                 if event.key == pygame.K_RIGHT:
                     self.k_right_is_pressed = True
 
+                # Change color using Page Up and Page Down
+                if event.key == pygame.K_PAGEDOWN:
+                    color_index = Bubble.COLORS.index(self.bubble.color)
+                    color_index = (color_index + 1) % len(Bubble.COLORS)
+                    self.bubble.color = Bubble.COLORS[color_index]
+                if event.key == pygame.K_PAGEUP:
+                    color_index = Bubble.COLORS.index(self.bubble.color)
+                    color_index = (color_index - 1) % len(Bubble.COLORS)
+                    self.bubble.color = Bubble.COLORS[color_index]
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_LEFT:
                     self.k_left_is_pressed = False

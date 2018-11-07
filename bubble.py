@@ -64,8 +64,12 @@ class PlayerBubble(Bubble):
         if self.rect.top < 0:
             self.y_change *= -1
 
-        if self.rect.centery > SCREEN_HEIGHT + self.rect.height:
+        # Reappear at arrow on falling off screen
+        if self.rect.top > SCREEN_HEIGHT:
             self.reset_pos()
+
+        # Redraw with new color
+        pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
 
 
 class BoardBubble(Bubble):
