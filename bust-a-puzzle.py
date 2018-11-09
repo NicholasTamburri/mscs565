@@ -17,6 +17,7 @@ import pygame
 import random
 
 from bubble import *
+from score import Score
 
 
 # --- Classes ---
@@ -61,7 +62,7 @@ class Game(object):
         # Create some board bubbles
         for column in range(8):
             x_pos = self.board.left_wall.rect.right + self.board.bubble_radius \
-                    + column * (self.board.bubble_diameter)
+                    + column * self.board.bubble_diameter
             for row in range(-1, 11):
                 y_pos = self.board.ceiling.rect.bottom + self.board.bubble_radius \
                         + (row) * (self.board.bubble_diameter - self.board.y_space)
@@ -120,6 +121,10 @@ class Game(object):
                                    self.board)
         self.bubble_list.add(self.bubble)
         self.all_sprites_list.add(self.bubble)
+
+        # Create the score display
+        self.score = Score()
+        self.all_sprites_list.add(self.score)
 
     def process_events(self):
         """ Process all of the events. Return a "True" if we need
@@ -256,10 +261,7 @@ class Game(object):
                 for bubble in new_bubble.connected_same_color_bubble_list:
                     bubble.kill()
                     count += 1
-                self.score += count
-
-                # Print current score. Remove this when score is displayed on screen instead.
-                print("Score:", self.score)
+                self.score.bubbles_popped(count)
 
                 # Recalculate all board bubbles' lists
                 for bubble in self.board.bubble_list:
@@ -282,11 +284,7 @@ class Game(object):
                         bubble.kill()
                         count += 1
                 if count > 0:
-                    self.score += 2 ** count
-
-                    # Print current score. Remove this when score is displayed on screen instead.
-                    print("Score:", self.score)
-
+                    self.score.bubbles_dropped(count)
 
             # Kill the fired bubble and those connected to it.
             # for bubble in new_bubble.connected_bubble_list:
