@@ -252,9 +252,14 @@ class Game(object):
             # Fired bubble hits a cluster of bubbles that share its color
             if len(new_bubble.connected_same_color_bubble_list) > 2:
                 # Pop bubbles: Kill the same-colored bubbles
+                count = 0
                 for bubble in new_bubble.connected_same_color_bubble_list:
                     bubble.kill()
-                new_bubble.kill()
+                    count += 1
+                self.score += count
+
+                # Print current score. Remove this when score is displayed on screen instead.
+                print("Score:", self.score)
 
                 # Recalculate all board bubbles' lists
                 for bubble in self.board.bubble_list:
@@ -265,6 +270,7 @@ class Game(object):
                     bubble.initialize_bubble_lists()
 
                 # Drop bubbles: Kill bubbles not connected to node (gray bubble)
+                count = 0
                 for bubble in self.board.bubble_list:
                     colors = []
                     for connected_bubble in bubble.connected_bubble_list:
@@ -274,6 +280,12 @@ class Game(object):
                         self.bubble_list.add(falling_bubble)
                         self.all_sprites_list.add(falling_bubble)
                         bubble.kill()
+                        count += 1
+                if count > 0:
+                    self.score += 2 ** count
+
+                    # Print current score. Remove this when score is displayed on screen instead.
+                    print("Score:", self.score)
 
 
             # Kill the fired bubble and those connected to it.
