@@ -18,6 +18,7 @@ import random
 
 from bubble import *
 from score import Score
+from splash import display_splash_screen
 
 
 # --- Classes ---
@@ -132,6 +133,7 @@ class Game(object):
             to close the window. """
 
         for event in pygame.event.get():
+
             if event.type == pygame.QUIT:
                 return True
 
@@ -313,12 +315,15 @@ class Game(object):
         """ Display everything to the screen for the game. """
         screen.fill(WHITE)
 
-        if self.game_started:
+        if not self.game_started:
+            display_splash_screen(screen)
+
+        else:
             self.all_sprites_list.draw(screen)
 
         if self.game_over:
             # font = pygame.font.Font("Serif", 25)
-            font = pygame.font.SysFont("serif", 25)
+            font = pygame.font.SysFont("sans", 25)
             text = font.render("Game Over, click to restart", True, BLACK)
             center_x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             center_y = (SCREEN_HEIGHT // 2) - (text.get_height() // 2)
