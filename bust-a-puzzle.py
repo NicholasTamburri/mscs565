@@ -33,6 +33,7 @@ class Game(object):
         the game. """
 
         self.score = 0
+        self.game_started = False
         self.game_over = False
 
         self.k_left_is_pressed = False
@@ -133,56 +134,58 @@ class Game(object):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 return True
+
             if event.type == pygame.MOUSEBUTTONDOWN:
+                self.game_started = True
                 if self.game_over:
                     self.__init__()
-                else:
-                    # Debug stuff
-                    bubble = sprite_at(pygame.mouse.get_pos(), self.board.bubble_list)
-                    if bubble:
-                        print("Adjacent:   ", bubble.adjacent_bubble_list)
-                        print("Connected:  ", bubble.connected_bubble_list)
-                        print("Color chain:", bubble.connected_same_color_bubble_list)
-                        print()
-                        if pygame.mouse.get_pressed()[1]:
-                            for bub in bubble.connected_same_color_bubble_list:
-                                bub.kill()
-                        if pygame.mouse.get_pressed()[2]:
-                            for bub in bubble.connected_bubble_list:
-                                bub.kill()
+                # Debug stuff
+                bubble = sprite_at(pygame.mouse.get_pos(), self.board.bubble_list)
+                if bubble:
+                    print("Adjacent:   ", bubble.adjacent_bubble_list)
+                    print("Connected:  ", bubble.connected_bubble_list)
+                    print("Color chain:", bubble.connected_same_color_bubble_list)
+                    print()
+                    if pygame.mouse.get_pressed()[1]:
+                        for bub in bubble.connected_same_color_bubble_list:
+                            bub.kill()
+                    if pygame.mouse.get_pressed()[2]:
+                        for bub in bubble.connected_bubble_list:
+                            bub.kill()
 
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    self.k_left_is_pressed = True
-                if event.key == pygame.K_UP:
-                    self.k_up_is_pressed = True
-                if event.key == pygame.K_RIGHT:
-                    self.k_right_is_pressed = True
+            if self.game_started:
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_LEFT:
+                        self.k_left_is_pressed = True
+                    if event.key == pygame.K_UP:
+                        self.k_up_is_pressed = True
+                    if event.key == pygame.K_RIGHT:
+                        self.k_right_is_pressed = True
 
-                # Change color using Page Up and Page Down
-                if event.key == pygame.K_PAGEDOWN:
-                    color_index = Bubble.COLORS.index(self.bubble.color)
-                    color_index = (color_index + 1) % len(Bubble.COLORS)
-                    self.bubble.color = Bubble.COLORS[color_index]
-                if event.key == pygame.K_PAGEUP:
-                    color_index = Bubble.COLORS.index(self.bubble.color)
-                    color_index = (color_index - 1) % len(Bubble.COLORS)
-                    self.bubble.color = Bubble.COLORS[color_index]
+                    # Change color using Page Up and Page Down
+                    if event.key == pygame.K_PAGEDOWN:
+                        color_index = Bubble.COLORS.index(self.bubble.color)
+                        color_index = (color_index + 1) % len(Bubble.COLORS)
+                        self.bubble.color = Bubble.COLORS[color_index]
+                    if event.key == pygame.K_PAGEUP:
+                        color_index = Bubble.COLORS.index(self.bubble.color)
+                        color_index = (color_index - 1) % len(Bubble.COLORS)
+                        self.bubble.color = Bubble.COLORS[color_index]
 
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT:
-                    self.k_left_is_pressed = False
-                if event.key == pygame.K_UP:
-                    self.k_up_is_pressed = False
-                if event.key == pygame.K_RIGHT:
-                    self.k_right_is_pressed = False
+                if event.type == pygame.KEYUP:
+                    if event.key == pygame.K_LEFT:
+                        self.k_left_is_pressed = False
+                    if event.key == pygame.K_UP:
+                        self.k_up_is_pressed = False
+                    if event.key == pygame.K_RIGHT:
+                        self.k_right_is_pressed = False
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
-                    and self.bubble.x_change == 0 and self.bubble.y_change == 0:
-                speed = 8
-                angle = math.radians(self.board.arrow.angle - 90)
-                self.bubble.x_change = -math.cos(angle) * speed
-                self.bubble.y_change = math.sin(angle) * speed
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
+                        and self.bubble.x_change == 0 and self.bubble.y_change == 0:
+                    speed = 8
+                    angle = math.radians(self.board.arrow.angle - 90)
+                    self.bubble.x_change = -math.cos(angle) * speed
+                    self.bubble.y_change = math.sin(angle) * speed
 
         return False
 
@@ -191,7 +194,7 @@ class Game(object):
         This method is run each time through the frame. It
         updates positions and checks for collisions.
         """
-        if not self.game_over:
+        if not self.game_over and self.game_started:
             # Move all the sprites
             self.all_sprites_list.update()
 
@@ -310,8 +313,8 @@ class Game(object):
         """ Display everything to the screen for the game. """
         screen.fill(WHITE)
 
-        # if not self.game_over:
-        self.all_sprites_list.draw(screen)
+        if self.game_started:
+            self.all_sprites_list.draw(screen)
 
         if self.game_over:
             # font = pygame.font.Font("Serif", 25)
