@@ -115,6 +115,81 @@ class BoardBubble(Bubble):
 
         board.bubble_list.add(self)
 
+
+class PoppingBubble(Bubble):
+    def __init__(self, bubble):
+        super().__init__(bubble.rect.centerx, bubble.rect.centery, bubble.color)
+
+        self.frame = 0
+
+    def update(self):
+        self.frame += 1
+
+        if self.frame <= 12:
+            self.image.fill(WHITE)
+            r = Board.BUBBLE_RADIUS
+            if self.frame <= 4:
+                thickness = 5
+            elif self.frame <= 8:
+                thickness = 3
+            else:
+                thickness = 1
+
+            pygame.draw.line(
+                self.image,
+                self.color,
+                [r, r * 2 / 3],
+                [r, r * 1 / 3],
+                thickness
+            )
+            pygame.draw.line(
+                self.image,
+                self.color,
+                [r, r * 4 / 3],
+                [r, r * 5 / 3],
+                thickness
+            )
+            pygame.draw.line(
+                self.image,
+                self.color,
+                [r + r * math.sqrt(3) / 6, r + r / 6],
+                [r + r * math.sqrt(3) / 3, r + r / 3],
+                thickness
+            )
+            pygame.draw.line(
+                self.image,
+                self.color,
+                [r + r * math.sqrt(3) / 6, r - r / 6],
+                [r + r * math.sqrt(3) / 3, r - r / 3],
+                thickness
+            )
+            pygame.draw.line(
+                self.image,
+                self.color,
+                [r - r * math.sqrt(3) / 6, r - r / 6],
+                [r - r * math.sqrt(3) / 3, r - r / 3],
+                thickness
+            )
+            pygame.draw.line(
+                self.image,
+                self.color,
+                [r - r * math.sqrt(3) / 6, r + r / 6],
+                [r - r * math.sqrt(3) / 3, r + r / 3],
+                thickness
+            )
+
+        else:
+            self.kill()
+
+        # Alternative popping animation
+        # if self.frame <= 20:
+        #     r = Board.BUBBLE_RADIUS
+        #     pygame.draw.circle(self.image, WHITE, [r, r], self.frame)
+        #
+        # else:
+        #     self.kill()
+
+
 class FallingBubble(Bubble):
     def __init__(self, bubble):
         super().__init__(bubble.rect.centerx, bubble.rect.centery, bubble.color)

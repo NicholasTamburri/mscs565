@@ -264,6 +264,9 @@ class Game(object):
                 # Pop bubbles: Kill the same-colored bubbles
                 count = 0
                 for bubble in new_bubble.connected_same_color_bubble_list:
+                    popping_bubble = PoppingBubble(bubble)
+                    self.bubble_list.add(popping_bubble)
+                    self.all_sprites_list.add(popping_bubble)
                     bubble.kill()
                     count += 1
                 self.score.bubbles_popped(count)
