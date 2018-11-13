@@ -37,6 +37,10 @@ class Game(object):
         self.game_started = False
         self.game_over = False
 
+        self.image1 = pygame.image.load("demo1.png").convert()
+        self.image2 = pygame.image.load("demo2.png").convert()
+        self.image3 = pygame.image.load("demo3.png").convert()
+
         self.k_left_is_pressed = False
         self.k_up_is_pressed = False
         self.k_right_is_pressed = False
@@ -319,7 +323,7 @@ class Game(object):
         screen.fill(WHITE)
 
         if not self.game_started:
-            display_splash_screen(screen)
+            display_splash_screen(screen, self.image1, self.image2, self.image3)
 
         else:
             self.all_sprites_list.draw(screen)
