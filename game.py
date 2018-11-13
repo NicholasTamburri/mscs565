@@ -1,20 +1,15 @@
 """
 Nicholas Tamburri
-Bust-a-Puzzle Version 0.0.1
+Bust-a-Puzzle Version 0.0.2
 
 A board of bubbles is generated. The player controls the arrow
 at the bottom of the board, which aims and fires bubbles.
 Fired bubbles stick to the bubbles on the board.
 Game ends when a board bubble is below the kill line at the bottom.
-Neither removing board bubbles nor shifting them down have been implemented yet.
 
 Play by aiming the arrow using (fittingly) the arrow keys
 and using the space bar to fire the bubble.
 """
-
-import math
-import pygame
-import random
 
 import stages
 
@@ -440,6 +435,11 @@ def main():
 
     # Create an instance of the Game class
     game = Game()
+
+    # Play music
+    if pygame.mixer:
+        pygame.mixer.music.load("music.xm")
+        pygame.mixer.music.play()
 
     # Main game loop
     while not done:
