@@ -27,6 +27,9 @@ class Score(pygame.sprite.Sprite):
     def bubbles_dropped(self, count):
         points = 0
         if count > 0:
+            # Limit drop bonus to 17 bubbles, i.e. 1310720 points
+            if count > 17:
+                count = 17
             points = (2 ** count) * 10
             self.value += points
         return points
