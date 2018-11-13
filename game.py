@@ -19,7 +19,7 @@ import random
 import stages
 
 from bubble import *
-from score import Score
+from score import Score, DropScore
 from splash import display_splash_screen
 from utils import determine_next, is_board_cleared
 
@@ -175,6 +175,8 @@ class Game(object):
         # Create the score display
         self.score = Score()
         self.all_sprites_list.add(self.score)
+
+        self.drop_score = None
 
     def process_events(self):
         """ Process all of the events. Return a "True" if we need
@@ -341,7 +343,10 @@ class Game(object):
                         bubble.kill()
                         count += 1
                 if count > 0:
-                    self.score.bubbles_dropped(count)
+                    if self.drop_score is not None:
+                        self.drop_score.kill()
+                    self.drop_score = DropScore(self.score.bubbles_dropped(count))
+                    self.all_sprites_list.add(self.drop_score)
 
                 # Kill any nodes that do not have regular bubbles attached
                 for bubble in self.board.bubble_list:
@@ -402,19 +407,19 @@ class Game(object):
             self.all_sprites_list.draw(screen)
 
         if self.stage_cleared:
-            font = pygame.font.SysFont("sans", 25)
+            font = pygame.font.SysFont("sans", 36)
             text = font.render("Stage clear! Click to advance.", True, BLACK)
-            center_x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
-            center_y = (SCREEN_HEIGHT // 2) - (text.get_height() // 2)
-            screen.blit(text, [center_x, center_y])
+            x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
+            y = (SCREEN_HEIGHT // 2) - (text.get_height() * 2)
+            screen.blit(text, [x, y])
 
         if self.game_over:
             # font = pygame.font.Font("Serif", 25)
-            font = pygame.font.SysFont("sans", 25)
+            font = pygame.font.SysFont("sans", 36)
             text = font.render("Game Over. Click to restart.", True, BLACK)
-            center_x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
-            center_y = (SCREEN_HEIGHT // 2) - (text.get_height() // 2)
-            screen.blit(text, [center_x, center_y])
+            x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
+            y = (SCREEN_HEIGHT // 2) - (text.get_height() * 2)
+            screen.blit(text, [x, y])
 
         pygame.display.flip()
 
@@ -427,7 +432,7 @@ def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("Bust-a-Puzzle v0.0.1")
+    pygame.display.set_caption("Bust-a-Puzzle v0.0.2")
 
     # Create our objects and set the data
     done = False
