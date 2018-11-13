@@ -97,6 +97,22 @@ class KillLine(pygame.sprite.Sprite):
         self.rect.y = y
 
 
+class NextSign(pygame.sprite.Sprite):
+    """ The text "NEXT" that is displayed over the next bubble to fire. """
+    def __init__(self):
+        super().__init__()
+
+        font = pygame.font.SysFont("sans", 24)
+        text = font.render("NEXT", True, BLACK)
+
+        self.image = pygame.Surface([text.get_width(), text.get_height()])
+        self.image.set_colorkey(WHITE)
+        self.image.fill(WHITE)
+        self.image.blit(text, [0, 0])
+
+        self.rect = self.image.get_rect()
+
+
 class Board(object):
     """ This class represents the game board. """
     BUBBLE_RADIUS = 20
@@ -144,3 +160,10 @@ class Board(object):
 
         kill_line_y = self.y + self.rows * (self.bubble_diameter - self.y_space) + self.y_space
         self.kill_line = KillLine(kill_line_y, self)
+
+        self.next_sign = NextSign()
+        self.next_sign.rect.centerx = self.arrow.rect.centerx + 100
+        self.next_sign.rect.y = self.arrow.rect.centery - Board.BUBBLE_RADIUS - self.next_sign.rect.height
+        # rect = self.next_sign.image.get_rect()
+        # self.next_sign.image.get_rect().centerx = self.arrow.rect.centerx + 100
+        # self.next_sign.image.get_rect().centery = self.arrow.rect.centery - self.next_sign.text

@@ -30,6 +30,10 @@ class Bubble(pygame.sprite.Sprite):
         self.x_change = 0
         self.y_change = 0
 
+    def update(self):
+        # Redraw with new color
+        pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+
 
 class PlayerBubble(Bubble):
     """ This class represents the bubble that the player shoots. """

@@ -124,10 +124,19 @@ class Game(object):
         # Create the player's bubble
         self.bubble = PlayerBubble(self.board.arrow.rect.centerx,
                                    self.board.arrow.rect.centery,
-                                   YELLOW,
+                                   determine_next(self.board),
                                    self.board)
         self.bubble_list.add(self.bubble)
         self.all_sprites_list.add(self.bubble)
+
+        # Create the next bubble
+        self.next_bubble = Bubble(self.board.arrow.rect.centerx + 100,
+                                  self.board.arrow.rect.centery,
+                                  determine_next(self.board))
+        self.bubble_list.add(self.next_bubble)
+        self.all_sprites_list.add(self.next_bubble)
+
+        self.all_sprites_list.add(self.board.next_sign)
 
         # Create the score display
         self.score = Score()
@@ -313,7 +322,10 @@ class Game(object):
             self.bubble.reset_pos()
 
             # Change color of player's bubble
-            self.bubble.color = determine_next(self.board)
+            self.bubble.color = self.next_bubble.color
+
+            # Change color of next bubble
+            self.next_bubble.color = determine_next(self.board)
 
             # End game if the new bubble is below the kill line
             if new_bubble.rect.centery > self.board.kill_line.rect.y:
