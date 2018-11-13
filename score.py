@@ -8,7 +8,7 @@ class Score(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__()
 
-        self.width = int(SCREEN_WIDTH / 3)
+        self.width = SCREEN_WIDTH
         self.height = 48
 
         self.image = pygame.Surface([self.width, self.height])
