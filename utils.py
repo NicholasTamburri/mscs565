@@ -21,3 +21,11 @@ def determine_next(board):
     if len(colors) == 0:
         return RED
     return colors[random.randrange(len(colors))]
+
+
+def is_board_cleared(board):
+    colors = []
+    for bubble in board.bubble_list:
+        if bubble.color not in colors and bubble.color in board.BUBBLE_COLORS:
+            colors.append(bubble.color)
+    return len(colors) == 0

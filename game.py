@@ -19,7 +19,7 @@ import random
 from bubble import *
 from score import Score
 from splash import display_splash_screen
-from utils import determine_next
+from utils import determine_next, is_board_cleared
 
 
 # --- Classes ---
@@ -36,6 +36,7 @@ class Game(object):
 
         self.score = 0
         self.game_started = False
+        self.stage_cleared = False
         self.game_over = False
 
         self.image1 = pygame.image.load("demo1.png").convert()
@@ -153,7 +154,7 @@ class Game(object):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.game_started = True
-                if self.game_over:
+                if self.game_over or self.stage_cleared:
                     self.__init__()
                 # Debug stuff
                 bubble = sprite_at(pygame.mouse.get_pos(), self.board.bubble_list)
@@ -169,7 +170,7 @@ class Game(object):
                         for bub in bubble.connected_bubble_list:
                             bub.kill()
 
-            if self.game_started:
+            if self.game_started and not self.stage_cleared:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_LEFT:
                         self.k_left_is_pressed = True
@@ -210,7 +211,7 @@ class Game(object):
         This method is run each time through the frame. It
         updates positions and checks for collisions.
         """
-        if not self.game_over and self.game_started:
+        if self.game_started and not self.game_over:
             # Move all the sprites
             self.all_sprites_list.update()
 
@@ -327,6 +328,10 @@ class Game(object):
             # Change color of next bubble
             self.next_bubble.color = determine_next(self.board)
 
+            # End stage if the board is cleared
+            if is_board_cleared(self.board):
+                self.stage_cleared = True
+
             # End game if the new bubble is below the kill line
             if new_bubble.rect.centery > self.board.kill_line.rect.y:
                 self.game_over = True
@@ -345,10 +350,17 @@ class Game(object):
         else:
             self.all_sprites_list.draw(screen)
 
+        if self.stage_cleared:
+            font = pygame.font.SysFont("sans", 25)
+            text = font.render("Stage clear! Click to advance.", True, BLACK)
+            center_x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
+            center_y = (SCREEN_HEIGHT // 2) - (text.get_height() // 2)
+            screen.blit(text, [center_x, center_y])
+
         if self.game_over:
             # font = pygame.font.Font("Serif", 25)
             font = pygame.font.SysFont("sans", 25)
-            text = font.render("Game Over, click to restart", True, BLACK)
+            text = font.render("Game Over. Click to restart.", True, BLACK)
             center_x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             center_y = (SCREEN_HEIGHT // 2) - (text.get_height() // 2)
             screen.blit(text, [center_x, center_y])

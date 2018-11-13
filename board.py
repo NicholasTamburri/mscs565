@@ -164,6 +164,3 @@ class Board(object):
         self.next_sign = NextSign()
         self.next_sign.rect.centerx = self.arrow.rect.centerx + 100
         self.next_sign.rect.y = self.arrow.rect.centery - Board.BUBBLE_RADIUS - self.next_sign.rect.height
-        # rect = self.next_sign.image.get_rect()
-        # self.next_sign.image.get_rect().centerx = self.arrow.rect.centerx + 100
-        # self.next_sign.image.get_rect().centery = self.arrow.rect.centery - self.next_sign.text
