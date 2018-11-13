@@ -1,4 +1,7 @@
 import pygame
+import random
+
+from constants import RED
 
 
 def sprite_at(position, sprite_list):
@@ -8,3 +11,13 @@ def sprite_at(position, sprite_list):
     point.rect.x = position[0]
     point.rect.y = position[1]
     return pygame.sprite.spritecollideany(point, sprite_list)
+
+
+def determine_next(board):
+    colors = []
+    for bubble in board.bubble_list:
+        if bubble.color not in colors and bubble.color in board.BUBBLE_COLORS:
+            colors.append(bubble.color)
+    if len(colors) == 0:
+        return RED
+    return colors[random.randrange(len(colors))]

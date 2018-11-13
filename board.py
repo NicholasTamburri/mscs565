@@ -1,4 +1,5 @@
-import pygame, math
+import math
+import pygame
 
 from constants import *
 
@@ -41,7 +42,7 @@ class Arrow(pygame.sprite.Sprite):
 
         # Angle is in degrees.
         # 0 is straight up, positive is left, negative is right
-        self.angle = 0 # degrees
+        self.angle = 0  # degrees
         self.change_angle = 0
 
     def update(self):
@@ -101,6 +102,8 @@ class Board(object):
     BUBBLE_RADIUS = 20
     BUBBLE_DIAMETER = BUBBLE_RADIUS * 2
 
+    BUBBLE_COLORS = (RED, ORANGE, YELLOW, GREEN, BLUE)
+
     COLUMNS = 8
     ROWS = 11
 
@@ -108,11 +111,11 @@ class Board(object):
 
     # Some math to find vertical spacing of the bubbles
     Y_SPACE = math.sqrt(4 / 5 * (
-            math.sqrt(BUBBLE_RADIUS ** 2 + BUBBLE_DIAMETER ** 2) \
-            - BUBBLE_DIAMETER \
+            math.sqrt(BUBBLE_RADIUS ** 2 + BUBBLE_DIAMETER ** 2)
+            - BUBBLE_DIAMETER
         ) ** 2) \
-              + math.sqrt(BUBBLE_RADIUS ** 2 + BUBBLE_DIAMETER ** 2) \
-              - BUBBLE_DIAMETER
+        + math.sqrt(BUBBLE_RADIUS ** 2 + BUBBLE_DIAMETER ** 2)\
+        - BUBBLE_DIAMETER
     # For reference, here is the math:
     # distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
     # space = distance - Bubble.DIAMETER

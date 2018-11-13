@@ -19,6 +19,7 @@ import random
 from bubble import *
 from score import Score
 from splash import display_splash_screen
+from utils import determine_next
 
 
 # --- Classes ---
@@ -311,9 +312,13 @@ class Game(object):
             # Ready another bubble to be fired
             self.bubble.reset_pos()
 
+            # Change color of player's bubble
+            self.bubble.color = determine_next(self.board)
+
             # End game if the new bubble is below the kill line
             if new_bubble.rect.centery > self.board.kill_line.rect.y:
                 self.game_over = True
+
         # if bubble_hit and bubble_hit.color == self.bubble.color:
         #     bubble_hit.kill()
         #     self.bubble.reset_pos()
