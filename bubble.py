@@ -7,7 +7,7 @@ class Bubble(pygame.sprite.Sprite):
     RADIUS = 20
     DIAMETER = RADIUS * 2
 
-    COLORS = (RED, ORANGE, YELLOW, GREEN, BLUE)
+    COLORS = [RED, ORANGE, YELLOW, GREEN, BLUE]
 
     def __init__(self, centerx, centery, color):
         """ Constructor, create the image of the block. """
@@ -18,7 +18,14 @@ class Bubble(pygame.sprite.Sprite):
 
         self.color = color
 
-        pygame.draw.circle(self.image, color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+        if self.color in Bubble.COLORS:
+            pygame.draw.circle(self.image, color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+        elif self.color == NODE:
+            pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+            self.g = 125
+            self.g_increasing = True
+            pygame.draw.circle(self.image, (255, self.g, 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
+
         self.rect = self.image.get_rect()
         self.rect.centerx = centerx
         self.rect.centery = centery
@@ -32,7 +39,21 @@ class Bubble(pygame.sprite.Sprite):
 
     def update(self):
         # Redraw with new color
-        pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+        if self.color in Bubble.COLORS:
+            pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+        elif self.color == NODE:
+            pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+            if self.g_increasing:
+                self.g += 5
+                if self.g > 255:
+                    self.g -= 5
+                    self.g_increasing = False
+            else:
+                self.g -= 5
+                if self.g < 0:
+                    self.g += 5
+                    self.g_increasing = True
+            pygame.draw.circle(self.image, (255, self.g, 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
 
 
 class PlayerBubble(Bubble):
@@ -73,7 +94,11 @@ class PlayerBubble(Bubble):
             self.reset_pos()
 
         # Redraw with new color
-        pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+        if self.color in Bubble.COLORS:
+            pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+        elif self.color == NODE:
+            pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+            pygame.draw.circle(self.image, ORANGE, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
 
 
 class BoardBubble(Bubble):
@@ -129,69 +154,70 @@ class PoppingBubble(Bubble):
     def update(self):
         self.frame += 1
 
-        if self.frame <= 12:
-            self.image.fill(WHITE)
-            r = Board.BUBBLE_RADIUS
-            if self.frame <= 4:
-                thickness = 5
-            elif self.frame <= 8:
-                thickness = 3
+        if self.color in Bubble.COLORS:
+            if self.frame <= 12:
+                self.image.fill(WHITE)
+                r = Board.BUBBLE_RADIUS
+                if self.frame <= 4:
+                    thickness = 5
+                elif self.frame <= 8:
+                    thickness = 3
+                else:
+                    thickness = 1
+
+                pygame.draw.line(
+                    self.image,
+                    self.color,
+                    [r, r * 2 / 3],
+                    [r, r * 1 / 3],
+                    thickness
+                )
+                pygame.draw.line(
+                    self.image,
+                    self.color,
+                    [r, r * 4 / 3],
+                    [r, r * 5 / 3],
+                    thickness
+                )
+                pygame.draw.line(
+                    self.image,
+                    self.color,
+                    [r + r * math.sqrt(3) / 6, r + r / 6],
+                    [r + r * math.sqrt(3) / 3, r + r / 3],
+                    thickness
+                )
+                pygame.draw.line(
+                    self.image,
+                    self.color,
+                    [r + r * math.sqrt(3) / 6, r - r / 6],
+                    [r + r * math.sqrt(3) / 3, r - r / 3],
+                    thickness
+                )
+                pygame.draw.line(
+                    self.image,
+                    self.color,
+                    [r - r * math.sqrt(3) / 6, r - r / 6],
+                    [r - r * math.sqrt(3) / 3, r - r / 3],
+                    thickness
+                )
+                pygame.draw.line(
+                    self.image,
+                    self.color,
+                    [r - r * math.sqrt(3) / 6, r + r / 6],
+                    [r - r * math.sqrt(3) / 3, r + r / 3],
+                    thickness
+                )
+
             else:
-                thickness = 1
+                self.kill()
 
-            pygame.draw.line(
-                self.image,
-                self.color,
-                [r, r * 2 / 3],
-                [r, r * 1 / 3],
-                thickness
-            )
-            pygame.draw.line(
-                self.image,
-                self.color,
-                [r, r * 4 / 3],
-                [r, r * 5 / 3],
-                thickness
-            )
-            pygame.draw.line(
-                self.image,
-                self.color,
-                [r + r * math.sqrt(3) / 6, r + r / 6],
-                [r + r * math.sqrt(3) / 3, r + r / 3],
-                thickness
-            )
-            pygame.draw.line(
-                self.image,
-                self.color,
-                [r + r * math.sqrt(3) / 6, r - r / 6],
-                [r + r * math.sqrt(3) / 3, r - r / 3],
-                thickness
-            )
-            pygame.draw.line(
-                self.image,
-                self.color,
-                [r - r * math.sqrt(3) / 6, r - r / 6],
-                [r - r * math.sqrt(3) / 3, r - r / 3],
-                thickness
-            )
-            pygame.draw.line(
-                self.image,
-                self.color,
-                [r - r * math.sqrt(3) / 6, r + r / 6],
-                [r - r * math.sqrt(3) / 3, r + r / 3],
-                thickness
-            )
+        elif self.color == NODE:
+            if self.frame <= 20:
+                r = Board.BUBBLE_RADIUS
+                pygame.draw.circle(self.image, WHITE, [r, r], self.frame)
 
-        else:
-            self.kill()
-
-        # Alternative popping animation
-        # if self.frame <= 20:
-        #     r = Board.BUBBLE_RADIUS
-        #     pygame.draw.circle(self.image, WHITE, [r, r], self.frame)
-        #
-        # else:
-        #     self.kill()
+            else:
+                self.kill()
 
 
 class FallingBubble(Bubble):

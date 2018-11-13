@@ -70,6 +70,7 @@ class Game(object):
         self.all_sprites_list.add(self.board.arrow)
 
         # Create some board bubbles
+        self.stage = 0  # Index of stage in the stage list
         index = 0  # Index of bubble in stage pattern
         for row in range(-1, 11):
             y_pos = self.board.ceiling.rect.bottom + self.board.bubble_radius \
@@ -79,13 +80,13 @@ class Game(object):
                         + column * self.board.bubble_diameter
                 if row % 2 == 1:
                     x_pos += self.board.bubble_radius
-                # elif row > -1:
-                #     x_pos -= self.board.bubble_radius
+
                 if column != 7 or row % 2 == 0:
                     # These lines represent the board pattern
-                    if index < len(stages.STAGES[0]) \
-                            and row == stages.STAGES[0][int(index)][0] and column == stages.STAGES[0][int(index)][1]:
-                        bubble = BoardBubble(x_pos, y_pos, stages.STAGES[0][int(index)][2], self.board)
+                    if index < len(stages.STAGES[self.stage]) \
+                            and row == stages.STAGES[self.stage][int(index)][0] \
+                            and column == stages.STAGES[self.stage][int(index)][1]:
+                        bubble = BoardBubble(x_pos, y_pos, stages.STAGES[self.stage][int(index)][2], self.board)
                         self.board.bubble_list.add(bubble)
                         self.bubble_list.add(bubble)
                         self.all_sprites_list.add(bubble)
@@ -186,8 +187,9 @@ class Game(object):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.game_started = True
-                if self.game_over or self.stage_cleared:
+                if self.game_over or self.stage >= len(stages.STAGES):
                     self.__init__()
+
                 # Debug stuff
                 bubble = sprite_at(pygame.mouse.get_pos(), self.board.bubble_list)
                 if bubble:
@@ -326,13 +328,13 @@ class Game(object):
                 for bubble in self.board.bubble_list:
                     bubble.initialize_bubble_lists()
 
-                # Drop bubbles: Kill bubbles not connected to node (gray bubble)
+                # Drop bubbles: Kill bubbles not connected to node
                 count = 0
                 for bubble in self.board.bubble_list:
                     colors = []
                     for connected_bubble in bubble.connected_bubble_list:
                         colors.append(connected_bubble.color)
-                    if GRAY not in colors:
+                    if NODE not in colors:
                         falling_bubble = FallingBubble(bubble)
                         self.bubble_list.add(falling_bubble)
                         self.all_sprites_list.add(falling_bubble)
@@ -340,6 +342,22 @@ class Game(object):
                         count += 1
                 if count > 0:
                     self.score.bubbles_dropped(count)
+
+                # Kill any nodes that do not have regular bubbles attached
+                for bubble in self.board.bubble_list:
+                    if bubble.color == NODE:
+                        colors = []
+                        for connected_bubble in bubble.connected_bubble_list:
+                            colors.append(connected_bubble.color)
+                        connected_to_regular_bubble = False
+                        for color in self.board.BUBBLE_COLORS:
+                            if color in colors:
+                                connected_to_regular_bubble = True
+                        if not connected_to_regular_bubble:
+                            popping_bubble = PoppingBubble(bubble)
+                            self.bubble_list.add(popping_bubble)
+                            self.all_sprites_list.add(popping_bubble)
+                            bubble.kill()
 
             # Kill the fired bubble and those connected to it.
             # for bubble in new_bubble.connected_bubble_list:
@@ -363,6 +381,7 @@ class Game(object):
             # End stage if the board is cleared
             if is_board_cleared(self.board):
                 self.stage_cleared = True
+                self.stage += 1
 
             # End game if the new bubble is below the kill line
             if new_bubble.rect.centery > self.board.kill_line.rect.y:

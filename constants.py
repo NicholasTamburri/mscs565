@@ -8,5 +8,8 @@ YELLOW = (255, 255, 0)
 ORANGE = (255, 127, 0)
 GRAY = (127, 127, 127)
 
+# Special bubble types
+NODE = 1
+
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 500
