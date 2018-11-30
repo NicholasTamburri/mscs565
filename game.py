@@ -230,12 +230,14 @@ class Game(object):
                     if event.key == pygame.K_RIGHT:
                         self.k_right_is_pressed = False
 
+                # Shoot bubble
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
                         and self.bubble.x_change == 0 and self.bubble.y_change == 0:
                     speed = 8
                     angle = math.radians(self.board.arrow.angle - 90)
                     self.bubble.x_change = -math.cos(angle) * speed
                     self.bubble.y_change = math.sin(angle) * speed
+                    self.board.shots_fired += 1
 
         return False
 
@@ -380,14 +382,22 @@ class Game(object):
             # Change color of next bubble
             self.next_bubble.color = determine_next(self.board)
 
+            # Move bubbles down depending on shot counter
+            if self.board.shots_fired >= 6:
+                self.board.shots_fired = 0
+                for bubble in self.board.bubble_list:
+                    bubble.rect.y += self.board.y_space
+
             # End stage if the board is cleared
             if is_board_cleared(self.board):
                 self.stage_cleared = True
                 self.stage += 1
 
-            # End game if the new bubble is below the kill line
-            if new_bubble.rect.centery > self.board.kill_line.rect.y:
-                self.game_over = True
+            # End game if any bubble is below the kill line
+            for bubble in self.board.bubble_list:
+                if bubble.rect.centery > self.board.kill_line.rect.y:
+                    self.game_over = True
+                    break
 
         # if bubble_hit and bubble_hit.color == self.bubble.color:
         #     bubble_hit.kill()
