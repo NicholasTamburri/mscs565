@@ -1,6 +1,6 @@
 """
 Nicholas Tamburri
-Bust-a-Puzzle Version 0.0.2
+Bust-a-Puzzle Version 0.0.3
 
 A board of bubbles is generated. The player controls the arrow
 at the bottom of the board, which aims and fires bubbles.
@@ -437,9 +437,9 @@ def main():
     game = Game()
 
     # Play music
-    if pygame.mixer:
-        pygame.mixer.music.load("music.xm")
-        pygame.mixer.music.play()
+    # if pygame.mixer:
+    #     pygame.mixer.music.load("music.xm")
+    #     pygame.mixer.music.play()
 
     # Main game loop
     while not done:

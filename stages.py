@@ -3,9 +3,9 @@ from constants import *
 
 # Bubbles are in the format (row, column, color)
 
-STAGES = [
+STAGES = (
     # Stage 1
-    [
+    (
         (-1, 0, NODE), (-1, 1, NODE), (-1, 2, NODE), (-1, 3, NODE),
         (-1, 4, NODE), (-1, 5, NODE), (-1, 6, NODE),
 
@@ -18,5 +18,5 @@ STAGES = [
         (2, 1, YELLOW), (2, 2, YELLOW), (2, 5, YELLOW), (2, 6, YELLOW),
 
         (3, 1, GREEN), (3, 5, GREEN)
-    ]
-]
+    ),
+)
