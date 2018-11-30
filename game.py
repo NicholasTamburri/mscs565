@@ -69,7 +69,7 @@ class Game(object):
         index = 0  # Index of bubble in stage pattern
         for row in range(-1, 11):
             y_pos = self.board.ceiling.rect.bottom + self.board.bubble_radius \
-                    + row * (self.board.bubble_diameter - self.board.y_space)
+                    + row * self.board.y_space
             for column in range(8):
                 x_pos = self.board.left_wall.rect.right + self.board.bubble_radius \
                         + column * self.board.bubble_diameter
@@ -279,9 +279,9 @@ class Game(object):
             if abs(y_diff) < self.board.bubble_radius:  # Same row
                 new_y = bubble_hit.rect.centery
             elif y_diff < 0:                            # Above row
-                new_y = bubble_hit.rect.centery - self.board.bubble_diameter + self.board.y_space
+                new_y = bubble_hit.rect.centery - self.board.y_space
             else:                                       # Below row
-                new_y = bubble_hit.rect.centery + self.board.bubble_diameter - self.board.y_space
+                new_y = bubble_hit.rect.centery + self.board.y_space
 
             if new_y == bubble_hit.rect.centery:  # If same row
                 if x_diff > 0:                    # Right column

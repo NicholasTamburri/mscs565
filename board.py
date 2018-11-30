@@ -125,23 +125,14 @@ class Board(object):
 
     WIDTH = COLUMNS * BUBBLE_DIAMETER
 
-    # Some math to find vertical spacing of the bubbles
-    Y_SPACE = math.sqrt(4 / 5 * (
-            math.sqrt(BUBBLE_RADIUS ** 2 + BUBBLE_DIAMETER ** 2)
-            - BUBBLE_DIAMETER
-        ) ** 2) \
-        + math.sqrt(BUBBLE_RADIUS ** 2 + BUBBLE_DIAMETER ** 2)\
-        - BUBBLE_DIAMETER
-    # For reference, here is the math:
-    # distance = math.sqrt(Bubble.RADIUS ** 2 + Bubble.DIAMETER ** 2)
-    # space = distance - Bubble.DIAMETER
-    # y_space = math.sqrt(4 / 5 * space ** 2)
+    Y_SPACE = int(BUBBLE_RADIUS * math.sqrt(3))
 
     def __init__(self):
         super().__init__()
 
         self.bubble_radius = Board.BUBBLE_RADIUS
         self.bubble_diameter = Board.BUBBLE_DIAMETER
+        self.y_space = int(self.bubble_radius * math.sqrt(3))
 
         self.width = Board.WIDTH
         self.x = SCREEN_WIDTH / 2 - self.width / 2
@@ -149,7 +140,6 @@ class Board(object):
 
         self.columns = Board.COLUMNS
         self.rows = Board.ROWS
-        self.y_space = Board.Y_SPACE
 
         self.arrow = Arrow(self.x + self.width / 2 + 2)
         self.bubble_list = pygame.sprite.Group()
@@ -158,7 +148,7 @@ class Board(object):
         self.left_wall = Wall(self.x, self)
         self.right_wall = Wall(self.x + self.width + 1, self)
 
-        kill_line_y = self.y + self.rows * (self.bubble_diameter - self.y_space) + self.y_space
+        kill_line_y = self.y + self.rows * self.y_space
         self.kill_line = KillLine(kill_line_y, self)
 
         self.next_sign = NextSign()
