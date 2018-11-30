@@ -68,10 +68,12 @@ class Game(object):
         self.stage = 0  # Index of stage in the stage list
         index = 0  # Index of bubble in stage pattern
         for row in range(-1, 11):
-            y_pos = self.board.ceiling.rect.bottom + self.board.bubble_radius \
+            y_pos = self.board.ceiling.rect.bottom \
+                    + self.board.bubble_radius \
                     + row * self.board.y_space
             for column in range(8):
-                x_pos = self.board.left_wall.rect.right + self.board.bubble_radius \
+                x_pos = self.board.left_wall.rect.right\
+                        + self.board.bubble_radius \
                         + column * self.board.bubble_diameter
                 if row % 2 == 1:
                     x_pos += self.board.bubble_radius
@@ -79,9 +81,9 @@ class Game(object):
                 if column != 7 or row % 2 == 0:
                     # These lines represent the board pattern
                     if index < len(stages.STAGES[self.stage]) \
-                            and row == stages.STAGES[self.stage][int(index)][0] \
-                            and column == stages.STAGES[self.stage][int(index)][1]:
-                        bubble = BoardBubble(x_pos, y_pos, stages.STAGES[self.stage][int(index)][2], self.board)
+                            and row == stages.STAGES[self.stage][index][0] \
+                            and column == stages.STAGES[self.stage][index][1]:
+                        bubble = BoardBubble(x_pos, y_pos, stages.STAGES[self.stage][index][2], self.board)
                         self.board.bubble_list.add(bubble)
                         self.bubble_list.add(bubble)
                         self.all_sprites_list.add(bubble)
@@ -160,7 +162,7 @@ class Game(object):
 
         # Create the next bubble
         self.next_bubble = Bubble(self.board.arrow.rect.centerx + 100,
-                                  self.board.arrow.rect.centery,
+                                  self.board.arrow.rect.centery + 20,
                                   determine_next(self.board))
         self.bubble_list.add(self.next_bubble)
         self.all_sprites_list.add(self.next_bubble)

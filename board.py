@@ -153,4 +153,5 @@ class Board(object):
 
         self.next_sign = NextSign()
         self.next_sign.rect.centerx = self.arrow.rect.centerx + 100
-        self.next_sign.rect.y = self.arrow.rect.centery - Board.BUBBLE_RADIUS - self.next_sign.rect.height
+        self.next_sign.rect.y = self.arrow.rect.centery - self.bubble_radius\
+            - self.next_sign.rect.height + 20
