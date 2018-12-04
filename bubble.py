@@ -22,9 +22,9 @@ class Bubble(pygame.sprite.Sprite):
             pygame.draw.circle(self.image, color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
         elif self.color == NODE:
             pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
-            self.g = 125
-            self.g_increasing = True
-            pygame.draw.circle(self.image, (255, self.g, 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
+            self.shade = 125
+            self.shade_increasing = True
+            pygame.draw.circle(self.image, (255, self.shade, 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
 
         self.rect = self.image.get_rect()
         self.rect.centerx = centerx
@@ -41,19 +41,6 @@ class Bubble(pygame.sprite.Sprite):
         # Redraw with new color
         if self.color in Bubble.COLORS:
             pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
-        elif self.color == NODE:
-            pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
-            if self.g_increasing:
-                self.g += 5
-                if self.g > 255:
-                    self.g -= 5
-                    self.g_increasing = False
-            else:
-                self.g -= 5
-                if self.g < 0:
-                    self.g += 5
-                    self.g_increasing = True
-            pygame.draw.circle(self.image, (255, self.g, 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
 
 
 class PlayerBubble(Bubble):
@@ -143,6 +130,48 @@ class BoardBubble(Bubble):
         self.initialize_bubble_lists()
 
         board.bubble_list.add(self)
+
+    def update(self):
+        super().update()
+
+        if self.color == NODE:
+            pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+            if self.board.shots_fired == self.board.shift_shots - 2:
+                if self.shade_increasing:
+                    self.shade += 8
+                    if self.shade > 255:
+                        self.shade -= 8
+                        self.shade_increasing = False
+                else:
+                    self.shade -= 8
+                    if self.shade < 0:
+                        self.shade += 8
+                        self.shade_increasing = True
+                pygame.draw.circle(self.image, (255, self.shade, 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
+            elif self.board.shots_fired == self.board.shift_shots - 1:
+                if self.shade_increasing:
+                    self.shade += 22
+                    if self.shade > 255:
+                        self.shade -= 22
+                        self.shade_increasing = False
+                else:
+                    self.shade -= 22
+                    if self.shade < 0:
+                        self.shade += 22
+                        self.shade_increasing = True
+                pygame.draw.circle(self.image, (255, self.shade, 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
+            else:
+                if self.shade_increasing:
+                    self.shade += 2
+                    if self.shade > 255:
+                        self.shade -= 2
+                        self.shade_increasing = False
+                else:
+                    self.shade -= 2
+                    if self.shade < 100:
+                        self.shade += 2
+                        self.shade_increasing = True
+                pygame.draw.circle(self.image, (0, max(145, self.shade), 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
 
 
 class PoppingBubble(Bubble):

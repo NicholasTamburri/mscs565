@@ -142,6 +142,7 @@ class Board(object):
         self.rows = Board.ROWS
 
         self.arrow = Arrow(self.x + self.width / 2 + 2)
+        self.shift_shots = 6
         self.shots_fired = 0
 
         self.bubble_list = pygame.sprite.Group()

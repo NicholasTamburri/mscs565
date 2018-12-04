@@ -237,7 +237,7 @@ class Game(object):
                     angle = math.radians(self.board.arrow.angle - 90)
                     self.bubble.x_change = -math.cos(angle) * speed
                     self.bubble.y_change = math.sin(angle) * speed
-                    self.board.shots_fired += 1
+                    # Increment self.board.shots_fired when bubble hits
 
         return False
 
@@ -277,6 +277,8 @@ class Game(object):
             self.bubble, self.board.bubble_list, pygame.sprite.collide_circle
         )
         if bubble_hit:
+            self.board.shots_fired += 1
+
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery
 
@@ -383,7 +385,7 @@ class Game(object):
             self.next_bubble.color = determine_next(self.board)
 
             # Move bubbles down depending on shot counter
-            if self.board.shots_fired >= 6:
+            if self.board.shots_fired >= self.board.shift_shots:
                 self.board.shots_fired = 0
                 for bubble in self.board.bubble_list:
                     bubble.rect.y += self.board.y_space
