@@ -27,6 +27,56 @@ class Game(object):
         reset the game we'd just need to create a new instance of this
         class. """
 
+    def advance_stage(self):
+        # Clean up after previous stage
+        self.bubble_list.empty()
+        self.board.shots_fired = 0
+        self.bubble.kill()
+        self.next_bubble.kill()
+
+        self.stage += 1
+        self.stage_cleared = False
+
+        # Populate board
+        index = 0  # Index of bubble in stage pattern
+        for row in range(-1, 11):
+            y_pos = self.board.ceiling.rect.bottom \
+                    + self.board.bubble_radius \
+                    + row * self.board.y_space
+            for column in range(8):
+                x_pos = self.board.left_wall.rect.right \
+                        + self.board.bubble_radius \
+                        + column * self.board.bubble_diameter
+                if row % 2 == 1:
+                    x_pos += self.board.bubble_radius
+
+                if column != 7 or row % 2 == 0:
+                    # These lines represent the board pattern
+                    if index < len(stages.STAGES[self.stage]) \
+                            and row == stages.STAGES[self.stage][index][0] \
+                            and column == stages.STAGES[self.stage][index][1]:
+                        bubble = BoardBubble(x_pos, y_pos, stages.STAGES[self.stage][index][2], self.board)
+                        self.board.bubble_list.add(bubble)
+                        self.bubble_list.add(bubble)
+                        self.all_sprites_list.add(bubble)
+
+                        index += 1
+
+        # Create the player's bubble
+        self.bubble = PlayerBubble(self.board.arrow.rect.centerx,
+                                   self.board.arrow.rect.centery,
+                                   determine_next(self.board),
+                                   self.board)
+        self.bubble_list.add(self.bubble)
+        self.all_sprites_list.add(self.bubble)
+
+        # Create the next bubble
+        self.next_bubble = Bubble(self.board.arrow.rect.centerx + 100,
+                                  self.board.arrow.rect.centery + 20,
+                                  determine_next(self.board))
+        self.bubble_list.add(self.next_bubble)
+        self.all_sprites_list.add(self.next_bubble)
+
     def __init__(self):
         """ Constructor. Create all our attributes and initialize
         the game. """
@@ -64,108 +114,53 @@ class Game(object):
         # self.arrow = Arrow(self.board)
         self.all_sprites_list.add(self.board.arrow)
 
+        # Create the player's bubble
+        self.bubble = PlayerBubble(self.board.arrow.rect.centerx,
+                                   self.board.arrow.rect.centery,
+                                   determine_next(self.board),
+                                   self.board)
+        # self.bubble_list.add(self.bubble)
+        # self.all_sprites_list.add(self.bubble)
+
+        # Create the next bubble
+        self.next_bubble = Bubble(self.board.arrow.rect.centerx + 100,
+                                  self.board.arrow.rect.centery + 20,
+                                  determine_next(self.board))
+        # self.bubble_list.add(self.next_bubble)
+        # self.all_sprites_list.add(self.next_bubble)
+
         # Create some board bubbles
         self.stage = 0  # Index of stage in the stage list
-        index = 0  # Index of bubble in stage pattern
-        for row in range(-1, 11):
-            y_pos = self.board.ceiling.rect.bottom \
-                    + self.board.bubble_radius \
-                    + row * self.board.y_space
-            for column in range(8):
-                x_pos = self.board.left_wall.rect.right\
-                        + self.board.bubble_radius \
-                        + column * self.board.bubble_diameter
-                if row % 2 == 1:
-                    x_pos += self.board.bubble_radius
+        self.advance_stage()
 
-                if column != 7 or row % 2 == 0:
-                    # These lines represent the board pattern
-                    if index < len(stages.STAGES[self.stage]) \
-                            and row == stages.STAGES[self.stage][index][0] \
-                            and column == stages.STAGES[self.stage][index][1]:
-                        bubble = BoardBubble(x_pos, y_pos, stages.STAGES[self.stage][index][2], self.board)
-                        self.board.bubble_list.add(bubble)
-                        self.bubble_list.add(bubble)
-                        self.all_sprites_list.add(bubble)
-
-                        index += 1
-
-        # for column in range(8):
-        #     x_pos = self.board.left_wall.rect.right + self.board.bubble_radius \
-        #             + column * self.board.bubble_diameter
-        #     for row in range(-1, 11):
-        #         y_pos = self.board.ceiling.rect.bottom + self.board.bubble_radius \
-        #                 + (row) * (self.board.bubble_diameter - self.board.y_space)
+        # Populate the board
+        # index = 0  # Index of bubble in stage pattern
+        # for row in range(-1, 11):
+        #     y_pos = self.board.ceiling.rect.bottom \
+        #             + self.board.bubble_radius \
+        #             + row * self.board.y_space
+        #     for column in range(8):
+        #         x_pos = self.board.left_wall.rect.right\
+        #                 + self.board.bubble_radius \
+        #                 + column * self.board.bubble_diameter
         #         if row % 2 == 1:
         #             x_pos += self.board.bubble_radius
-        #         elif row > -1:
-        #             x_pos -= self.board.bubble_radius
+        #
         #         if column != 7 or row % 2 == 0:
         #             # These lines represent the board pattern
-        #             if row == stages.STAGES[0][int(index)][0] and column == stages.STAGES[0][int(index)][1]:
-        #                 bubble = BoardBubble(x_pos, y_pos, stages.STAGES[0][int(index)][2], self.board)
+        #             if index < len(stages.STAGES[self.stage]) \
+        #                     and row == stages.STAGES[self.stage][index][0] \
+        #                     and column == stages.STAGES[self.stage][index][1]:
+        #                 bubble = BoardBubble(x_pos, y_pos, stages.STAGES[self.stage][index][2], self.board)
         #                 self.board.bubble_list.add(bubble)
         #                 self.bubble_list.add(bubble)
         #                 self.all_sprites_list.add(bubble)
         #
         #                 index += 1
 
-                    # if row == -1:
-                    #     # Add node bubble
-                    #     node = BoardBubble(x_pos, y_pos, GRAY, self.board)
-                    #     self.board.bubble_list.add(node)
-                    #     self.bubble_list.add(node)
-                    #     self.all_sprites_list.add(node)
-                    # if row == 0:
-                    #     # Add the bubble
-                    #     bubble = BoardBubble(x_pos, y_pos, RED, self.board)
-                    #     self.board.bubble_list.add(bubble)
-                    #     self.bubble_list.add(bubble)
-                    #     self.all_sprites_list.add(bubble)
-                    # if row == 1:
-                    #     if column != 3:
-                    #         # Add the bubble
-                    #         bubble = BoardBubble(x_pos, y_pos, ORANGE, self.board)
-                    #         self.board.bubble_list.add(bubble)
-                    #         self.bubble_list.add(bubble)
-                    #         self.all_sprites_list.add(bubble)
-                    # if row == 2:
-                    #     if column == 1\
-                    #             or column == 2\
-                    #             or column == 5\
-                    #             or column == 6:
-                    #         # Add the bubble
-                    #         bubble = BoardBubble(x_pos, y_pos, YELLOW, self.board)
-                    #         self.board.bubble_list.add(bubble)
-                    #         self.bubble_list.add(bubble)
-                    #         self.all_sprites_list.add(bubble)
-                    # if row == 3:
-                    #     if column == 1\
-                    #             or column == 5:
-                    #         # Add the bubble
-                    #         bubble = BoardBubble(x_pos, y_pos, GREEN, self.board)
-                    #         self.board.bubble_list.add(bubble)
-                    #         self.bubble_list.add(bubble)
-                    #         self.all_sprites_list.add(bubble)
-
         # Create the kill line
         # self.kill_line = KillLine(y_pos + Bubble.RADIUS, self.board)
         self.all_sprites_list.add(self.board.kill_line)
-
-        # Create the player's bubble
-        self.bubble = PlayerBubble(self.board.arrow.rect.centerx,
-                                   self.board.arrow.rect.centery,
-                                   determine_next(self.board),
-                                   self.board)
-        self.bubble_list.add(self.bubble)
-        self.all_sprites_list.add(self.bubble)
-
-        # Create the next bubble
-        self.next_bubble = Bubble(self.board.arrow.rect.centerx + 100,
-                                  self.board.arrow.rect.centery + 20,
-                                  determine_next(self.board))
-        self.bubble_list.add(self.next_bubble)
-        self.all_sprites_list.add(self.next_bubble)
 
         self.all_sprites_list.add(self.board.next_sign)
 
@@ -186,8 +181,11 @@ class Game(object):
 
             if event.type == pygame.MOUSEBUTTONDOWN:
                 self.game_started = True
-                if self.game_over or self.stage >= len(stages.STAGES):
+                if self.game_over or self.stage >= len(stages.STAGES) - 1:
                     self.__init__()
+
+                elif self.stage_cleared:
+                    self.advance_stage()
 
                 # Debug stuff
                 bubble = sprite_at(pygame.mouse.get_pos(), self.board.bubble_list)
@@ -393,7 +391,6 @@ class Game(object):
             # End stage if the board is cleared
             if is_board_cleared(self.board):
                 self.stage_cleared = True
-                self.stage += 1
 
             # End game if any bubble is below the kill line
             for bubble in self.board.bubble_list:
