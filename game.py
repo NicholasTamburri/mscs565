@@ -37,6 +37,11 @@ class Game(object):
         self.stage += 1
         self.stage_cleared = False
 
+        # Do not start if there are no more stages
+        if self.stage >= len(stages.STAGES):
+            self.__init__()
+            return
+
         # Populate board
         index = 0  # Index of bubble in stage pattern
         for row in range(-1, 11):
@@ -131,7 +136,7 @@ class Game(object):
 
         # Create some board bubbles
         self.stage = 0  # Index of stage in the stage list
-        self.advance_stage()
+        # self.advance_stage()
 
         # Populate the board
         # index = 0  # Index of bubble in stage pattern
@@ -180,8 +185,11 @@ class Game(object):
                 return True
 
             if event.type == pygame.MOUSEBUTTONDOWN:
-                self.game_started = True
-                if self.game_over or self.stage >= len(stages.STAGES) - 1:
+                if not self.game_started:
+                    self.game_started = True
+                    self.advance_stage()
+
+                if self.game_over or self.stage >= len(stages.STAGES):
                     self.__init__()
 
                 elif self.stage_cleared:
@@ -244,7 +252,10 @@ class Game(object):
         This method is run each time through the frame. It
         updates positions and checks for collisions.
         """
-        if self.game_started and not self.game_over:
+        if self.game_over:
+            return
+
+        if self.game_started:
             # Move all the sprites
             self.all_sprites_list.update()
 
@@ -446,11 +457,6 @@ def main():
 
     # Create an instance of the Game class
     game = Game()
-
-    # Play music
-    # if pygame.mixer:
-    #     pygame.mixer.music.load("music.xm")
-    #     pygame.mixer.music.play()
 
     # Main game loop
     while not done:

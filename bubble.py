@@ -20,8 +20,10 @@ class Bubble(pygame.sprite.Sprite):
 
         if self.color in Bubble.COLORS:
             pygame.draw.circle(self.image, color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+            pygame.draw.circle(self.image, BLACK, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS, 1)
         elif self.color == NODE:
             pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+            pygame.draw.circle(self.image, BLACK, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS, 1)
             self.shade = 125
             self.shade_increasing = True
             pygame.draw.circle(self.image, (255, self.shade, 0), [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
@@ -41,6 +43,7 @@ class Bubble(pygame.sprite.Sprite):
         # Redraw with new color
         if self.color in Bubble.COLORS:
             pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+            pygame.draw.circle(self.image, BLACK, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS, 1)
 
 
 class PlayerBubble(Bubble):
@@ -63,7 +66,6 @@ class PlayerBubble(Bubble):
         self.float_centery = float(self.rect.centery)
 
     def update(self):
-        """ Automatically called when we need to move the block. """
         self.float_centerx += self.x_change
         self.float_centery += self.y_change
 
@@ -83,9 +85,10 @@ class PlayerBubble(Bubble):
         # Redraw with new color
         if self.color in Bubble.COLORS:
             pygame.draw.circle(self.image, self.color, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
-        elif self.color == NODE:
-            pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
-            pygame.draw.circle(self.image, ORANGE, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
+            pygame.draw.circle(self.image, BLACK, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS, 1)
+        # elif self.color == NODE:
+        #     pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+        #     pygame.draw.circle(self.image, ORANGE, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
 
 
 class BoardBubble(Bubble):
@@ -136,6 +139,7 @@ class BoardBubble(Bubble):
 
         if self.color == NODE:
             pygame.draw.circle(self.image, GRAY, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS)
+            pygame.draw.circle(self.image, BLACK, [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS, 1)
             if self.board.shots_fired == self.board.shift_shots - 2:
                 if self.shade_increasing:
                     self.shade += 8
