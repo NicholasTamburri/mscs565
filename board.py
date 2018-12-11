@@ -136,7 +136,7 @@ class Board(object):
 
         self.width = Board.WIDTH
         self.x = SCREEN_WIDTH / 2 - self.width / 2
-        self.y = 50
+        self.y = 40
 
         self.columns = Board.COLUMNS
         self.rows = Board.ROWS
