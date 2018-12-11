@@ -283,7 +283,7 @@ class Game(object):
 
         # Handle collision with board bubble
         bubble_hit = pygame.sprite.spritecollideany(
-            self.bubble, self.board.bubble_list, pygame.sprite.collide_circle
+            self.bubble, self.board.bubble_list, pygame.sprite.collide_circle_ratio(0.9)
         )
         if bubble_hit:
             self.board.shots_fired += 1
