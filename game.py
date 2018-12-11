@@ -138,31 +138,6 @@ class Game(object):
         self.stage = 0  # Index of stage in the stage list
         # self.advance_stage()
 
-        # Populate the board
-        # index = 0  # Index of bubble in stage pattern
-        # for row in range(-1, 11):
-        #     y_pos = self.board.ceiling.rect.bottom \
-        #             + self.board.bubble_radius \
-        #             + row * self.board.y_space
-        #     for column in range(8):
-        #         x_pos = self.board.left_wall.rect.right\
-        #                 + self.board.bubble_radius \
-        #                 + column * self.board.bubble_diameter
-        #         if row % 2 == 1:
-        #             x_pos += self.board.bubble_radius
-        #
-        #         if column != 7 or row % 2 == 0:
-        #             # These lines represent the board pattern
-        #             if index < len(stages.STAGES[self.stage]) \
-        #                     and row == stages.STAGES[self.stage][index][0] \
-        #                     and column == stages.STAGES[self.stage][index][1]:
-        #                 bubble = BoardBubble(x_pos, y_pos, stages.STAGES[self.stage][index][2], self.board)
-        #                 self.board.bubble_list.add(bubble)
-        #                 self.bubble_list.add(bubble)
-        #                 self.all_sprites_list.add(bubble)
-        #
-        #                 index += 1
-
         # Create the kill line
         # self.kill_line = KillLine(y_pos + Bubble.RADIUS, self.board)
         self.all_sprites_list.add(self.board.kill_line)
@@ -450,7 +425,7 @@ def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("Bust-a-Puzzle v0.0.2")
+    pygame.display.set_caption("Bust-a-Puzzle v0.0.3ea")
 
     # Create our objects and set the data
     done = False

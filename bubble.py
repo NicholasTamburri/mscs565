@@ -95,14 +95,14 @@ class BoardBubble(Bubble):
     """ This class represents bubbles on the board. """
 
     def initialize_bubble_lists(self):
-        for position in [
+        for position in (
             (self.rect.centerx + self.board.bubble_diameter, self.rect.centery),
-            (self.rect.centerx + self.board.bubble_radius, self.rect.centery - self.board.bubble_diameter),
-            (self.rect.centerx - self.board.bubble_radius, self.rect.centery - self.board.bubble_diameter),
+            (self.rect.centerx + self.board.bubble_radius, self.rect.centery - self.board.y_space),
+            (self.rect.centerx - self.board.bubble_radius, self.rect.centery - self.board.y_space),
             (self.rect.centerx - self.board.bubble_diameter, self.rect.centery),
-            (self.rect.centerx - self.board.bubble_radius, self.rect.centery + self.board.bubble_diameter),
-            (self.rect.centerx + self.board.bubble_radius, self.rect.centery + self.board.bubble_diameter)
-        ]:
+            (self.rect.centerx - self.board.bubble_radius, self.rect.centery + self.board.y_space),
+            (self.rect.centerx + self.board.bubble_radius, self.rect.centery + self.board.y_space)
+        ):
             bubble = sprite_at(position, self.board.bubble_list)
             if bubble:
                 self.adjacent_bubble_list.add(bubble)
@@ -111,6 +111,7 @@ class BoardBubble(Bubble):
         self.connected_bubble_list.add(self)
         for bubble in self.adjacent_bubble_list:
             self.connected_bubble_list.add(bubble.connected_bubble_list)
+            bubble.connected_bubble_list.add(self.connected_bubble_list)
         for bubble in self.connected_bubble_list:
             bubble.connected_bubble_list.add(self)
 
@@ -118,6 +119,7 @@ class BoardBubble(Bubble):
         for bubble in self.adjacent_bubble_list:
             if bubble.color == self.color:
                 self.connected_same_color_bubble_list.add(bubble.connected_same_color_bubble_list)
+                bubble.connected_same_color_bubble_list.add(self.connected_same_color_bubble_list)
         for bubble in self.connected_same_color_bubble_list:
             bubble.connected_same_color_bubble_list.add(self)
 
