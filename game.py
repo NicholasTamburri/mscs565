@@ -184,7 +184,8 @@ class Game(object):
             if event.type == pygame.QUIT:
                 return True
 
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN\
+                    or event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
                 if not self.game_started:
                     self.game_started = True
                     self.advance_stage()
@@ -425,7 +426,7 @@ class Game(object):
 
         if self.stage_cleared:
             font = pygame.font.SysFont("sans", 36)
-            text = font.render("Stage clear! Click to advance.", True, BLACK)
+            text = font.render("Stage clear! Press Return or click to advance.", True, BLACK)
             x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             y = (SCREEN_HEIGHT // 2) - (text.get_height() * 2)
             screen.blit(text, [x, y])
@@ -433,7 +434,7 @@ class Game(object):
         if self.game_over:
             # font = pygame.font.Font("Serif", 25)
             font = pygame.font.SysFont("sans", 36)
-            text = font.render("Game Over. Click to restart.", True, BLACK)
+            text = font.render("Game Over. Press Return or click to restart.", True, BLACK)
             x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             y = (SCREEN_HEIGHT // 2) - (text.get_height() * 2)
             screen.blit(text, [x, y])

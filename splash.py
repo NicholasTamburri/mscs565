@@ -48,6 +48,6 @@ def display_splash_screen(screen, image1, image2, image3):
 
     # Click to begin
     y = SCREEN_HEIGHT - 50
-    text = font.render("Click the screen to begin.", True, BLACK)
+    text = font.render("Press the Return key or click the screen to begin.", True, BLACK)
     x = SCREEN_WIDTH // 2 - text.get_width() // 2
     screen.blit(text, [x, y])
