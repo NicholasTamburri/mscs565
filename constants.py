@@ -13,3 +13,6 @@ NODE = 1
 
 SCREEN_WIDTH = 700
 SCREEN_HEIGHT = 500
+
+BGMS = ("music/bgm1.wav", "music/bgm2.wav")
+VOLUME = 0.2
