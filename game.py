@@ -11,6 +11,7 @@ Play by aiming the arrow using (fittingly) the arrow keys
 and using the space bar to fire the bubble.
 """
 
+import random
 import stages
 
 from bubble import *
@@ -25,6 +26,13 @@ class Game(object):
     """ This class represents an instance of the game. If we need to
         reset the game we'd just need to create a new instance of this
         class. """
+
+    @staticmethod
+    def play_music(music):
+        if pygame.mixer:
+            pygame.mixer.music.load(music)
+            pygame.mixer.music.set_volume(0.05)
+            pygame.mixer.music.play()
 
     def advance_stage(self):
         # Clean up after previous stage
@@ -85,6 +93,9 @@ class Game(object):
                                   determine_next(self.board))
         self.bubble_list.add(self.next_bubble)
         self.all_sprites_list.add(self.next_bubble)
+
+        music = BGMS[random.randrange(len(BGMS))]
+        Game.play_music(music)
 
     def __init__(self):
         """ Constructor. Create all our attributes and initialize
@@ -150,6 +161,8 @@ class Game(object):
         self.all_sprites_list.add(self.score)
 
         self.drop_score = None
+
+        Game.play_music("music/title.wav")
 
     def process_events(self):
         """ Process all of the events. Return a "True" if we need
@@ -391,6 +404,11 @@ class Game(object):
             if is_board_cleared(self.board):
                 self.stage_cleared = True
 
+                if self.stage < len(stages.STAGES) - 1:
+                    Game.play_music("music/stage_clear.wav")
+                else:
+                    Game.play_music("music/game_clear.wav")
+
                 # Time bonus
                 prev_score = self.score.value
                 self.score.time_bonus(self.elapsed_time)
@@ -399,36 +417,39 @@ class Game(object):
                 pygame.time.set_timer(STAGE_TICK, 0)
                 self.board.countdown.unset_shot_timer()
 
-                # End game if any bubble is below the kill line
+            # End game if any bubble is below the kill line
+            for bubble in self.board.bubble_list:
+                if bubble.rect.centery > self.board.kill_line.rect.y:
+                    self.game_over = True
+                    self.board.countdown.unset_shot_timer()
+                    Game.play_music("music/game_over.wav")
+                    break
+
+        elif self.bubble.rect.top >= SCREEN_HEIGHT:
+            self.board.shots_fired += 1
+
+            # Ready another bubble to be fired
+            self.bubble.reset_pos()
+
+            # Change color of player's bubble
+            self.bubble.color = self.next_bubble.color
+
+            # Change color of next bubble
+            self.next_bubble.color = determine_next(self.board)
+
+            # Move bubbles down depending on shot counter
+            if self.board.shots_fired >= self.board.shift_shots:
+                self.board.shots_fired = 0
                 for bubble in self.board.bubble_list:
-                    if bubble.rect.centery > self.board.kill_line.rect.y:
-                        self.game_over = True
-                        self.board.countdown.unset_shot_timer()
-                        break
+                    bubble.rect.y += self.board.y_space
 
-            elif self.bubble.rect.top >= SCREEN_HEIGHT:
-                self.board.shots_fired += 1
-
-                # Ready another bubble to be fired
-                self.bubble.reset_pos()
-
-                # Change color of player's bubble
-                self.bubble.color = self.next_bubble.color
-
-                # Change color of next bubble
-                self.next_bubble.color = determine_next(self.board)
-
-                # Move bubbles down depending on shot counter
-                if self.board.shots_fired >= self.board.shift_shots:
-                    self.board.shots_fired = 0
-                    for bubble in self.board.bubble_list:
-                        bubble.rect.y += self.board.y_space
-
-                # End game if any bubble is below the kill line
-                for bubble in self.board.bubble_list:
-                    if bubble.rect.centery > self.board.kill_line.rect.y:
-                        self.game_over = True
-                        break
+            # End game if any bubble is below the kill line
+            for bubble in self.board.bubble_list:
+                if bubble.rect.centery > self.board.kill_line.rect.y:
+                    self.game_over = True
+                    self.board.countdown.unset_shot_timer()
+                    Game.play_music("music/game_over.wav")
+                    break
 
     def display_frame(self, screen):
         """ Display everything to the screen for the game. """
