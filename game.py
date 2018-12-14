@@ -255,6 +255,9 @@ class Game(object):
                 if event.type == Countdown.SHOT_COUNTDOWN:
                     self.board.countdown.seconds_left -= 1
 
+                    if self.board.countdown.seconds_left <= 5:
+                        Game.play_sound("sounds/tick.wav")
+
                 # Stage clock
                 if event.type == STAGE_TICK:
                     self.elapsed_time += 1
