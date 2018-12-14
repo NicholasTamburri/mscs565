@@ -19,6 +19,7 @@ from splash import display_splash_screen
 from utils import determine_next, is_board_cleared
 
 SHOT_TIMEOUT = pygame.USEREVENT
+SHOT_COUNTDOWN = pygame.USEREVENT + 1
 SHOT_TIME = 10000  # milliseconds
 
 
@@ -27,13 +28,23 @@ class Game(object):
         reset the game we'd just need to create a new instance of this
         class. """
 
+    def reset_shot_timer(self):
+        pygame.time.set_timer(SHOT_TIMEOUT, SHOT_TIME)
+        pygame.time.set_timer(SHOT_COUNTDOWN, 1000)
+        self.board.countdown.seconds_left = SHOT_TIME / 1000
+
+    def unset_shot_timer(self):
+        pygame.time.set_timer(SHOT_TIMEOUT, 0)
+        pygame.time.set_timer(SHOT_COUNTDOWN, 0)
+        self.board.countdown.seconds_left = 0
+
     def advance_stage(self):
         # Clean up after previous stage
         self.bubble_list.empty()
         self.board.shots_fired = 0
         self.bubble.kill()
         self.next_bubble.kill()
-        pygame.time.set_timer(SHOT_TIMEOUT, SHOT_TIME)
+        self.reset_shot_timer()
 
         self.stage += 1
         self.stage_cleared = False
@@ -135,8 +146,8 @@ class Game(object):
         # self.bubble_list.add(self.next_bubble)
         # self.all_sprites_list.add(self.next_bubble)
 
-        # Unset shot timer
-        pygame.time.set_timer(SHOT_TIMEOUT, SHOT_TIME)
+        # Reset shot timer
+        self.reset_shot_timer()
 
         # Create some board bubbles
         self.stage = 0  # Index of stage in the stage list
@@ -147,6 +158,7 @@ class Game(object):
         self.all_sprites_list.add(self.board.kill_line)
 
         self.all_sprites_list.add(self.board.next_sign)
+        self.all_sprites_list.add(self.board.countdown)
 
         # Create the score display
         self.score = Score()
@@ -226,6 +238,11 @@ class Game(object):
                     angle = math.radians(self.board.arrow.angle - 90)
                     self.bubble.x_change = -math.cos(angle) * speed
                     self.bubble.y_change = math.sin(angle) * speed
+                    self.unset_shot_timer()
+
+                # Shot countdown
+                if event.type == SHOT_COUNTDOWN:
+                    self.board.countdown.seconds_left -= 1
 
         return False
 
@@ -269,7 +286,7 @@ class Game(object):
         )
         if bubble_hit:
             self.board.shots_fired += 1
-            pygame.time.set_timer(SHOT_TIMEOUT, SHOT_TIME)
+            self.reset_shot_timer()
 
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery

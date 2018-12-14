@@ -113,6 +113,35 @@ class NextSign(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
 
 
+class Countdown(pygame.sprite.Sprite):
+    """ This number represents the shot timer countdown. """
+
+    def __init__(self):
+        super().__init__()
+
+        font = pygame.font.SysFont("sans", 48)
+        text = font.render("M", True, BLACK)
+
+        self.image = pygame.Surface([text.get_width(), text.get_height()])
+        self.image.set_colorkey(WHITE)
+        self.image.fill(WHITE)
+
+        self.rect = self.image.get_rect()
+
+        self.seconds_left = 0
+
+    def update(self):
+        if self.seconds_left == 0:
+            self.image.fill(WHITE)
+
+        elif self.seconds_left <= 5:
+            font = pygame.font.SysFont("sans", 48)
+            text = font.render(str(int(self.seconds_left)), True, BLACK)
+
+            self.image.fill(WHITE)
+            self.image.blit(text, [0, 0])
+
+
 class Board(object):
     """ This class represents the game board. """
     BUBBLE_RADIUS = 20
@@ -158,3 +187,7 @@ class Board(object):
         self.next_sign.rect.centerx = self.arrow.rect.centerx + 100
         self.next_sign.rect.y = self.arrow.rect.centery - self.bubble_radius\
             - self.next_sign.rect.height + 20
+
+        self.countdown = Countdown()
+        self.countdown.rect.right = self.arrow.rect.left - 20
+        self.countdown.rect.centery = self.arrow.rect.centery
