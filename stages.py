@@ -26,6 +26,25 @@ STAGES = (
 
     # Stage 2
     (
+        (0, 1, NODE), (0, 2, NODE),
+
+        (1, 0, NODE), (1, 1, BLUE), (1, 2, NODE),
+
+        (2, 1, NODE), (2, 2, BLUE), (2, 5, NODE), (2, 6, NODE),
+
+        (3, 4, BLUE), (3, 5, BLUE), (3, 6, NODE),
+
+        (4, 5, NODE), (4, 6, NODE),
+
+        (5, 1, NODE), (5, 2, BLUE),
+
+        (6, 1, NODE), (6, 2, BLUE), (6, 3, NODE),
+
+        (7, 1, NODE), (7, 2, NODE),
+    ),
+
+    # Stage 3
+    (
         (-1, 0, NODE), (-1, 1, NODE), (-1, 2, NODE), (-1, 3, NODE),
         (-1, 4, NODE), (-1, 5, NODE), (-1, 6, NODE),
 
