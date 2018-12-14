@@ -1,4 +1,5 @@
 from board import *
+from game import Game
 from utils import sprite_at
 
 

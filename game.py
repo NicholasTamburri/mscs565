@@ -34,6 +34,13 @@ class Game(object):
             pygame.mixer.music.set_volume(0.05)
             pygame.mixer.music.play()
 
+    @staticmethod
+    def play_sound(sound_file):
+        if pygame.mixer:
+            sound = pygame.mixer.Sound(sound_file)
+            sound.set_volume(0.2)
+            sound.play()
+
     def advance_stage(self):
         # Clean up after previous stage
         self.bubble_list.empty()
@@ -242,6 +249,8 @@ class Game(object):
 
                     self.board.countdown.unset_shot_timer()
 
+                    Game.play_sound("sounds/shoot.wav")
+
                 # Shot countdown
                 if event.type == Countdown.SHOT_COUNTDOWN:
                     self.board.countdown.seconds_left -= 1
@@ -268,8 +277,10 @@ class Game(object):
                 or pygame.sprite.collide_rect(self.bubble,
                                               self.board.right_wall):
             self.bubble.x_change *= -1
+            Game.play_sound("sounds/ricochet.wav")
         if pygame.sprite.collide_rect(self.board.ceiling, self.bubble):
             self.bubble.y_change *= -1
+            Game.play_sound("sounds/ricochet.wav")
 
         # Handle arrow aiming
         if self.k_up_is_pressed:
@@ -294,6 +305,8 @@ class Game(object):
         if bubble_hit:
             self.board.shots_fired += 1
             self.board.countdown.reset_shot_timer()
+
+            Game.play_sound("sounds/ricochet.wav")
 
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery
@@ -341,6 +354,7 @@ class Game(object):
                     bubble.kill()
                     count += 1
                 self.score.bubbles_popped(count)
+                Game.play_sound("sounds/pop.wav")
 
                 # Recalculate all board bubbles' lists
                 for bubble in self.board.bubble_list:
@@ -369,7 +383,16 @@ class Game(object):
                         self.score.bubbles_dropped(count))
                     self.all_sprites_list.add(self.drop_score)
 
+                    # Play a sound for the dropped bubbles
+                    if count < 6:
+                        Game.play_sound("sounds/drop_few.wav")
+                    elif count < 12:
+                        Game.play_sound("sounds/drop_several.wav")
+                    else:
+                        Game.play_sound("sounds/drop_many.wav")
+
                 # Kill any nodes that do not have regular bubbles attached
+                sound_played = False
                 for bubble in self.board.bubble_list:
                     if bubble.color == NODE:
                         colors = []
@@ -385,6 +408,11 @@ class Game(object):
                             self.all_sprites_list.add(popping_bubble)
                             bubble.kill()
 
+                            # Play a sound for the cleared nodes, but only once
+                            if not sound_played:
+                                Game.play_sound("sounds/node_clear.wav")
+                                sound_played = True
+
             # Ready another bubble to be fired
             self.bubble.reset_pos()
 
@@ -397,8 +425,13 @@ class Game(object):
             # Move bubbles down depending on shot counter
             if self.board.shots_fired >= self.board.shift_shots:
                 self.board.shots_fired = 0
+                Game.play_sound("sounds/shift.wav")
                 for bubble in self.board.bubble_list:
                     bubble.rect.y += self.board.y_space
+
+            # Play a warning sound if the board will shift down after two shots
+            if self.board.shots_fired == self.board.shift_shots - 2:
+                Game.play_sound("sounds/warn.wav")
 
             # End stage if the board is cleared
             if is_board_cleared(self.board):
@@ -448,6 +481,37 @@ class Game(object):
                 if bubble.rect.centery > self.board.kill_line.rect.y:
                     self.game_over = True
                     self.board.countdown.unset_shot_timer()
+                    Game.play_music("music/game_over.wav")
+                    break
+
+        elif self.bubble.rect.top >= SCREEN_HEIGHT:
+            self.board.shots_fired += 1
+
+            # Ready another bubble to be fired
+            self.bubble.reset_pos()
+
+            # Change color of player's bubble
+            self.bubble.color = self.next_bubble.color
+
+            # Change color of next bubble
+            self.next_bubble.color = determine_next(self.board)
+
+            # Move bubbles down depending on shot counter
+            if self.board.shots_fired >= self.board.shift_shots:
+                self.board.shots_fired = 0
+                Game.play_sound("sounds/shift.wav")
+                for bubble in self.board.bubble_list:
+                    bubble.rect.y += self.board.y_space
+
+            # Play a warning sound if the board will shift down
+            # after two shots
+            if self.board.shots_fired == self.board.shift_shots - 2:
+                Game.play_sound("sounds/warn.wav")
+
+            # End game if any bubble is below the kill line
+            for bubble in self.board.bubble_list:
+                if bubble.rect.centery > self.board.kill_line.rect.y:
+                    self.game_over = True
                     Game.play_music("music/game_over.wav")
                     break
 
