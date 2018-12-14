@@ -58,17 +58,18 @@ class Game(object):
                 if row % 2 == 1:
                     x_pos += self.board.bubble_radius
 
-                if column != 7 or row % 2 == 0:
-                    # These lines represent the board pattern
-                    if index < len(stages.STAGES[self.stage]) \
-                            and row == stages.STAGES[self.stage][index][0] \
-                            and column == stages.STAGES[self.stage][index][1]:
-                        bubble = BoardBubble(x_pos, y_pos, stages.STAGES[self.stage][index][2], self.board)
-                        self.board.bubble_list.add(bubble)
-                        self.bubble_list.add(bubble)
-                        self.all_sprites_list.add(bubble)
+                if (column != 7 or row % 2 == 0)\
+                        and index < len(stages.STAGES[self.stage])\
+                        and row == stages.STAGES[self.stage][index][0]\
+                        and column == stages.STAGES[self.stage][index][1]:
+                    bubble = BoardBubble(
+                        x_pos, y_pos,
+                        stages.STAGES[self.stage][index][2], self.board)
+                    self.board.bubble_list.add(bubble)
+                    self.bubble_list.add(bubble)
+                    self.all_sprites_list.add(bubble)
 
-                        index += 1
+                    index += 1
 
         # Create the player's bubble
         self.bubble = PlayerBubble(self.board.arrow.rect.centerx,
@@ -171,7 +172,8 @@ class Game(object):
                 return True
 
             if event.type == pygame.MOUSEBUTTONDOWN\
-                    or event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
+                    or event.type == pygame.KEYDOWN\
+                    and event.key == pygame.K_RETURN:
                 if not self.game_started:
                     self.game_started = True
                     self.advance_stage()
@@ -183,11 +185,13 @@ class Game(object):
                     self.advance_stage()
 
                 # Debug stuff
-                bubble = sprite_at(pygame.mouse.get_pos(), self.board.bubble_list)
+                bubble = sprite_at(pygame.mouse.get_pos(),
+                                   self.board.bubble_list)
                 if bubble:
                     print("Adjacent:   ", bubble.adjacent_bubble_list)
                     print("Connected:  ", bubble.connected_bubble_list)
-                    print("Color chain:", bubble.connected_same_color_bubble_list)
+                    print("Color chain:",
+                          bubble.connected_same_color_bubble_list)
                     print()
                     if pygame.mouse.get_pressed()[1]:
                         for bub in bubble.connected_same_color_bubble_list:
@@ -259,7 +263,8 @@ class Game(object):
 
         # Bubble ricochets off walls and ceiling
         if pygame.sprite.collide_rect(self.board.left_wall, self.bubble)\
-                or pygame.sprite.collide_rect(self.bubble, self.board.right_wall):
+                or pygame.sprite.collide_rect(self.bubble,
+                                              self.board.right_wall):
             self.bubble.x_change *= -1
         if pygame.sprite.collide_rect(self.board.ceiling, self.bubble):
             self.bubble.y_change *= -1
@@ -281,7 +286,8 @@ class Game(object):
 
         # Handle collision with board bubble
         bubble_hit = pygame.sprite.spritecollideany(
-            self.bubble, self.board.bubble_list, pygame.sprite.collide_circle_ratio(0.9)
+            self.bubble, self.board.bubble_list,
+            pygame.sprite.collide_circle_ratio(0.9)
         )
         if bubble_hit:
             self.board.shots_fired += 1
@@ -299,9 +305,11 @@ class Game(object):
 
             if new_y == bubble_hit.rect.centery:  # If same row
                 if x_diff > 0:                    # Right column
-                    new_x = bubble_hit.rect.centerx + self.board.bubble_diameter
+                    new_x = bubble_hit.rect.centerx\
+                            + self.board.bubble_diameter
                 else:                             # Left column
-                    new_x = bubble_hit.rect.centerx - self.board.bubble_diameter
+                    new_x = bubble_hit.rect.centerx\
+                            - self.board.bubble_diameter
             else:
                 if x_diff > 0:                    # Right column
                     new_x = bubble_hit.rect.centerx + self.board.bubble_radius
@@ -309,7 +317,8 @@ class Game(object):
                     new_x = bubble_hit.rect.centerx - self.board.bubble_radius
 
             # Add a new bubble, based on the shot bubble, to the board
-            new_bubble = BoardBubble(new_x, new_y, self.bubble.color, self.board, True)
+            new_bubble = BoardBubble(new_x, new_y, self.bubble.color,
+                                     self.board, True)
             # Keep bubbles in bounds
             if new_bubble.rect.left <= self.board.x - 1:
                 new_bubble.rect.centerx += self.board.bubble_diameter
@@ -354,7 +363,8 @@ class Game(object):
                 if count > 0:
                     if self.drop_score is not None:
                         self.drop_score.kill()
-                    self.drop_score = DropScore(self.score.bubbles_dropped(count))
+                    self.drop_score = DropScore(
+                        self.score.bubbles_dropped(count))
                     self.all_sprites_list.add(self.drop_score)
 
                 # Kill any nodes that do not have regular bubbles attached
@@ -424,7 +434,8 @@ class Game(object):
         screen.fill(WHITE)
 
         if not self.game_started:
-            display_splash_screen(screen, self.image1, self.image2, self.image3)
+            display_splash_screen(screen,
+                                  self.image1, self.image2, self.image3)
 
         else:
             self.all_sprites_list.draw(screen)
@@ -464,7 +475,8 @@ class Game(object):
         if self.game_over:
             # font = pygame.font.Font("Serif", 25)
             font = pygame.font.SysFont("sans", 36)
-            text = font.render("Game Over. Press Return or click to restart.", True, BLACK)
+            text = font.render("Game Over. Press Return or click to restart.",
+                               True, BLACK)
             x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             y = (SCREEN_HEIGHT // 2) - (text.get_height() * 2)
             screen.blit(text, [x, y])

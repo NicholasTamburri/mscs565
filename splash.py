@@ -21,13 +21,15 @@ def display_splash_screen(screen, image1, image2, image3):
 
     # How to play
     y += text.get_height() + 24
-    text = font.render("Clear the bubbles by shooting same-colored groups.", True, BLACK)
+    text = font.render("Clear the bubbles by shooting same-colored groups.",
+                       True, BLACK)
     x = SCREEN_WIDTH // 2 - text.get_width() // 2
     screen.blit(text, [x, y])
 
     y += text.get_height() + 8
     font = pygame.font.SysFont("sans", 24, bold=True)
-    text = font.render("Use the arrow keys to aim and the space bar to fire.", True, BLACK, True)
+    text = font.render("Use the arrow keys to aim and the space bar to fire.",
+                       True, BLACK, True)
     x = SCREEN_WIDTH // 2 - text.get_width() // 2
     screen.blit(text, [x, y])
 
@@ -48,6 +50,7 @@ def display_splash_screen(screen, image1, image2, image3):
 
     # Click to begin
     y = SCREEN_HEIGHT - 50
-    text = font.render("Press the Return key or click the screen to begin.", True, BLACK)
+    text = font.render("Press the Return key or click the screen to begin.",
+                       True, BLACK)
     x = SCREEN_WIDTH // 2 - text.get_width() // 2
     screen.blit(text, [x, y])

@@ -57,7 +57,8 @@ class DropScore(pygame.sprite.Sprite):
         font = pygame.font.SysFont("sans", 36)
         self.text = font.render(str(points), True, BLACK)
 
-        self.image = pygame.Surface([self.text.get_width(), self.text.get_height()])
+        self.image = pygame.Surface([self.text.get_width(),
+                                     self.text.get_height()])
         self.image.fill(WHITE)
         self.image.set_colorkey(WHITE)
 
