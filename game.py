@@ -431,7 +431,20 @@ class Game(object):
 
         if self.stage_cleared:
             font = pygame.font.SysFont("sans", 36)
-            text = font.render("Stage clear! Press Return or click to advance.", True, BLACK)
+            if self.stage < len(stages.STAGES) - 1:
+                text = font.render("Stage clear! Press Return or click.",
+                                   True, BLACK)
+            else:
+                text = font.render("Congratulations! All stages clear.",
+                                   True, BLACK)
+                x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
+                y = (SCREEN_HEIGHT // 2) - (text.get_height() * 3) - 10
+                screen.blit(text, [x, y])
+
+                y += 10 + text.get_height()
+                text = font.render("Press Return or click to play again.",
+                                   True, BLACK)
+
             x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             y = (SCREEN_HEIGHT // 2) - (text.get_height() * 2)
             screen.blit(text, [x, y])
