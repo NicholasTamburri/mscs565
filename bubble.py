@@ -10,7 +10,6 @@ class Bubble(pygame.sprite.Sprite):
     COLORS = [RED, ORANGE, YELLOW, GREEN, BLUE]
 
     def __init__(self, centerx, centery, color):
-        """ Constructor, create the image of the block. """
         super().__init__()
         self.image = pygame.Surface([Bubble.DIAMETER, Bubble.DIAMETER])
         self.image.fill(WHITE)
@@ -179,7 +178,7 @@ class BoardBubble(Bubble):
                     if self.shade < 100:
                         self.shade += 2
                         self.shade_increasing = True
-                pygame.draw.circle(self.image,(0, max(145, self.shade), 0),
+                pygame.draw.circle(self.image, (0, max(145, self.shade), 0),
                                    [Bubble.RADIUS, Bubble.RADIUS], Bubble.RADIUS // 2)
 
 

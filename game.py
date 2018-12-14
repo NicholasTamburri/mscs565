@@ -18,8 +18,8 @@ from score import Score, DropScore
 from splash import display_splash_screen
 from utils import determine_next, is_board_cleared
 
-
-# --- Classes ---
+SHOT_TIMEOUT = pygame.USEREVENT
+SHOT_TIME = 10000  # milliseconds
 
 
 class Game(object):
@@ -33,6 +33,7 @@ class Game(object):
         self.board.shots_fired = 0
         self.bubble.kill()
         self.next_bubble.kill()
+        pygame.time.set_timer(SHOT_TIMEOUT, SHOT_TIME)
 
         self.stage += 1
         self.stage_cleared = False
@@ -134,6 +135,9 @@ class Game(object):
         # self.bubble_list.add(self.next_bubble)
         # self.all_sprites_list.add(self.next_bubble)
 
+        # Unset shot timer
+        pygame.time.set_timer(SHOT_TIMEOUT, SHOT_TIME)
+
         # Create some board bubbles
         self.stage = 0  # Index of stage in the stage list
         # self.advance_stage()
@@ -213,13 +217,15 @@ class Game(object):
                         self.k_right_is_pressed = False
 
                 # Shoot bubble
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE\
-                        and self.bubble.x_change == 0 and self.bubble.y_change == 0:
+                if event.type == pygame.KEYDOWN\
+                        and event.key == pygame.K_SPACE\
+                        and self.bubble.x_change == 0\
+                        and self.bubble.y_change == 0\
+                        or event.type == SHOT_TIMEOUT:
                     speed = 8
                     angle = math.radians(self.board.arrow.angle - 90)
                     self.bubble.x_change = -math.cos(angle) * speed
                     self.bubble.y_change = math.sin(angle) * speed
-                    # Increment self.board.shots_fired when bubble hits
 
         return False
 
@@ -263,6 +269,7 @@ class Game(object):
         )
         if bubble_hit:
             self.board.shots_fired += 1
+            pygame.time.set_timer(SHOT_TIMEOUT, SHOT_TIME)
 
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery
@@ -425,7 +432,7 @@ def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("Bust-a-Puzzle v0.0.3ea")
+    pygame.display.set_caption("Bust-a-Puzzle v0.0.3")
 
     # Create our objects and set the data
     done = False
