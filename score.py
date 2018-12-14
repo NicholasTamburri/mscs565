@@ -9,7 +9,7 @@ class Score(pygame.sprite.Sprite):
         super().__init__()
 
         self.width = SCREEN_WIDTH
-        self.height = 48
+        self.height = 96
 
         self.image = pygame.Surface([self.width, self.height])
         self.image.fill(WHITE)
@@ -41,10 +41,13 @@ class Score(pygame.sprite.Sprite):
         # Clear previous score
         self.image.fill(WHITE)
 
-        score_str = "Score: " + str(self.value)
         font = pygame.font.SysFont("sans", 48)
-        text = font.render(score_str, True, BLACK)
+        text = font.render("Score", True, BLACK)
         self.image.blit(text, [0, 0])
+
+        y = text.get_height()
+        text = font.render(str(self.value), True, BLACK)
+        self.image.blit(text, [0, y])
 
 
 class DropScore(pygame.sprite.Sprite):
