@@ -435,8 +435,9 @@ class Game(object):
             screen.blit(text, [x, y])
 
             y += 40 + text.get_height()
-            text = font.render("Elapsed time is {}.".format(self.elapsed_time),
-                               True, BLACK)
+            text = font.render(
+                "Elapsed time is {} seconds.".format(self.elapsed_time),
+                True, BLACK)
             x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             screen.blit(text, [x, y])
 
