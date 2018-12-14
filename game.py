@@ -88,7 +88,7 @@ class Game(object):
 
     def __init__(self):
         """ Constructor. Create all our attributes and initialize
-        the game. """
+            the game. """
 
         self.score = 0
         self.game_started = False
@@ -107,20 +107,15 @@ class Game(object):
         self.board = Board()
 
         # Create sprite lists
-        # self.board_bubble_list = pygame.sprite.Group()
         self.bubble_list = pygame.sprite.Group()
         self.all_sprites_list = pygame.sprite.Group()
 
         # Create play field borders
-        # self.ceiling = Ceiling(self.board)
-        # self.left_wall = Wall(SCREEN_WIDTH / 2 - 4 * Bubble.DIAMETER)
-        # self.right_wall = Wall(SCREEN_WIDTH / 2 + 4 * Bubble.DIAMETER)
         self.all_sprites_list.add(self.board.ceiling)
         self.all_sprites_list.add(self.board.left_wall)
         self.all_sprites_list.add(self.board.right_wall)
 
         # Create the arrow
-        # self.arrow = Arrow(self.board)
         self.all_sprites_list.add(self.board.arrow)
 
         # Create the player's bubble
@@ -128,15 +123,11 @@ class Game(object):
                                    self.board.arrow.rect.centery,
                                    determine_next(self.board),
                                    self.board)
-        # self.bubble_list.add(self.bubble)
-        # self.all_sprites_list.add(self.bubble)
 
         # Create the next bubble
         self.next_bubble = Bubble(self.board.arrow.rect.centerx + 100,
                                   self.board.arrow.rect.centery + 20,
                                   determine_next(self.board))
-        # self.bubble_list.add(self.next_bubble)
-        # self.all_sprites_list.add(self.next_bubble)
 
         # Reset shot timer
         self.board.countdown.reset_shot_timer()
@@ -147,10 +138,8 @@ class Game(object):
 
         # Create some board bubbles
         self.stage = 0  # Index of stage in the stage list
-        # self.advance_stage()
 
         # Create the kill line
-        # self.kill_line = KillLine(y_pos + Bubble.RADIUS, self.board)
         self.all_sprites_list.add(self.board.kill_line)
 
         self.all_sprites_list.add(self.board.next_sign)
@@ -250,10 +239,9 @@ class Game(object):
         return False
 
     def run_logic(self):
-        """
-        This method is run each time through the frame. It
-        updates positions and checks for collisions.
-        """
+        """ This method is run each time through the frame. It
+            updates positions and checks for collisions. """
+
         if self.game_over:
             return
 
@@ -383,16 +371,6 @@ class Game(object):
                             self.all_sprites_list.add(popping_bubble)
                             bubble.kill()
 
-            # Kill the fired bubble and those connected to it.
-            # for bubble in new_bubble.connected_bubble_list:
-            #     bubble.kill()
-            # new_bubble.kill()
-
-            # Kill the fired bubble and those adjacent to it.
-            # for bubble in new_bubble.adjacent_bubble_list:
-            #     bubble.kill()
-            # new_bubble.kill()
-
             # Ready another bubble to be fired
             self.bubble.reset_pos()
 
@@ -424,10 +402,6 @@ class Game(object):
                 if bubble.rect.centery > self.board.kill_line.rect.y:
                     self.game_over = True
                     break
-
-        # if bubble_hit and bubble_hit.color == self.bubble.color:
-        #     bubble_hit.kill()
-        #     self.bubble.reset_pos()
 
     def display_frame(self, screen):
         """ Display everything to the screen for the game. """
@@ -473,7 +447,6 @@ class Game(object):
             screen.blit(text, [x, y])
 
         if self.game_over:
-            # font = pygame.font.Font("Serif", 25)
             font = pygame.font.SysFont("sans", 36)
             text = font.render("Game Over. Press Return or click to restart.",
                                True, BLACK)
