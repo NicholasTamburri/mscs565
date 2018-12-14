@@ -485,6 +485,7 @@ class Game(object):
                     self.game_over = True
                     self.board.countdown.unset_shot_timer()
                     Game.play_music("music/game_over.wav")
+                    self.board.countdown.unset_shot_timer()
                     break
 
         elif self.bubble.rect.top >= SCREEN_HEIGHT:
