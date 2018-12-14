@@ -18,6 +18,8 @@ from score import Score, DropScore
 from splash import display_splash_screen
 from utils import determine_next, is_board_cleared
 
+STAGE_TICK = pygame.USEREVENT + 2
+
 
 class Game(object):
     """ This class represents an instance of the game. If we need to
@@ -31,6 +33,9 @@ class Game(object):
         self.bubble.kill()
         self.next_bubble.kill()
         self.board.countdown.reset_shot_timer()
+        self.elapsed_time = 0  # seconds
+        self.time_bonus = 0
+        pygame.time.set_timer(STAGE_TICK, 1000)
 
         self.stage += 1
         self.stage_cleared = False
@@ -135,6 +140,10 @@ class Game(object):
         # Reset shot timer
         self.board.countdown.reset_shot_timer()
 
+        # Reset stage timer
+        self.elapsed_time = 0  # seconds
+        self.time_bonus = 0
+
         # Create some board bubbles
         self.stage = 0  # Index of stage in the stage list
         # self.advance_stage()
@@ -229,6 +238,10 @@ class Game(object):
                 # Shot countdown
                 if event.type == Countdown.SHOT_COUNTDOWN:
                     self.board.countdown.seconds_left -= 1
+
+                # Stage clock
+                if event.type == STAGE_TICK:
+                    self.elapsed_time += 1
 
         return False
 
@@ -389,6 +402,13 @@ class Game(object):
             if is_board_cleared(self.board):
                 self.stage_cleared = True
 
+                # Time bonus
+                prev_score = self.score.value
+                self.score.time_bonus(self.elapsed_time)
+                self.time_bonus = self.score.value - prev_score
+
+                pygame.time.set_timer(STAGE_TICK, 0)
+
             # End game if any bubble is below the kill line
             for bubble in self.board.bubble_list:
                 if bubble.rect.centery > self.board.kill_line.rect.y:
@@ -414,6 +434,18 @@ class Game(object):
             text = font.render("Stage clear! Press Return or click to advance.", True, BLACK)
             x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             y = (SCREEN_HEIGHT // 2) - (text.get_height() * 2)
+            screen.blit(text, [x, y])
+
+            y += 40 + text.get_height()
+            text = font.render("Elapsed time is {}.".format(self.elapsed_time),
+                               True, BLACK)
+            x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
+            screen.blit(text, [x, y])
+
+            y += 10 + text.get_height()
+            text = font.render("Time bonus is {}.".format(self.time_bonus),
+                               True, BLACK)
+            x = (SCREEN_WIDTH // 2) - (text.get_width() // 2)
             screen.blit(text, [x, y])
 
         if self.game_over:

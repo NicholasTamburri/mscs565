@@ -34,6 +34,9 @@ class Score(pygame.sprite.Sprite):
             self.value += points
         return points
 
+    def time_bonus(self, seconds):
+        self.value += 500000 - 10000 * max(0, max(0, seconds - 15))
+
     def update(self):
         # Clear previous score
         self.image.fill(WHITE)
@@ -45,7 +48,8 @@ class Score(pygame.sprite.Sprite):
 
 
 class DropScore(pygame.sprite.Sprite):
-    """ This number pops up to let the player know how many points were earned from a drop. """
+    """ This number pops up to let the player know how many points were earned
+        from a drop. """
 
     def __init__(self, points):
         super().__init__()
