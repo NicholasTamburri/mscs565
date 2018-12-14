@@ -18,25 +18,11 @@ from score import Score, DropScore
 from splash import display_splash_screen
 from utils import determine_next, is_board_cleared
 
-SHOT_TIMEOUT = pygame.USEREVENT
-SHOT_COUNTDOWN = pygame.USEREVENT + 1
-SHOT_TIME = 10000  # milliseconds
-
 
 class Game(object):
     """ This class represents an instance of the game. If we need to
         reset the game we'd just need to create a new instance of this
         class. """
-
-    def reset_shot_timer(self):
-        pygame.time.set_timer(SHOT_TIMEOUT, SHOT_TIME)
-        pygame.time.set_timer(SHOT_COUNTDOWN, 1000)
-        self.board.countdown.seconds_left = SHOT_TIME / 1000
-
-    def unset_shot_timer(self):
-        pygame.time.set_timer(SHOT_TIMEOUT, 0)
-        pygame.time.set_timer(SHOT_COUNTDOWN, 0)
-        self.board.countdown.seconds_left = 0
 
     def advance_stage(self):
         # Clean up after previous stage
@@ -44,7 +30,7 @@ class Game(object):
         self.board.shots_fired = 0
         self.bubble.kill()
         self.next_bubble.kill()
-        self.reset_shot_timer()
+        self.board.countdown.reset_shot_timer()
 
         self.stage += 1
         self.stage_cleared = False
@@ -147,7 +133,7 @@ class Game(object):
         # self.all_sprites_list.add(self.next_bubble)
 
         # Reset shot timer
-        self.reset_shot_timer()
+        self.board.countdown.reset_shot_timer()
 
         # Create some board bubbles
         self.stage = 0  # Index of stage in the stage list
@@ -233,15 +219,15 @@ class Game(object):
                         and event.key == pygame.K_SPACE\
                         and self.bubble.x_change == 0\
                         and self.bubble.y_change == 0\
-                        or event.type == SHOT_TIMEOUT:
+                        or event.type == Countdown.SHOT_TIMEOUT:
                     speed = 8
                     angle = math.radians(self.board.arrow.angle - 90)
                     self.bubble.x_change = -math.cos(angle) * speed
                     self.bubble.y_change = math.sin(angle) * speed
-                    self.unset_shot_timer()
+                    self.board.countdown.unset_shot_timer()
 
                 # Shot countdown
-                if event.type == SHOT_COUNTDOWN:
+                if event.type == Countdown.SHOT_COUNTDOWN:
                     self.board.countdown.seconds_left -= 1
 
         return False
@@ -286,7 +272,7 @@ class Game(object):
         )
         if bubble_hit:
             self.board.shots_fired += 1
-            self.reset_shot_timer()
+            self.board.countdown.reset_shot_timer()
 
             x_diff = self.bubble.rect.centerx - bubble_hit.rect.centerx
             y_diff = self.bubble.rect.centery - bubble_hit.rect.centery

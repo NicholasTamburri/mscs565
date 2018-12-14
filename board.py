@@ -116,6 +116,10 @@ class NextSign(pygame.sprite.Sprite):
 class Countdown(pygame.sprite.Sprite):
     """ This number represents the shot timer countdown. """
 
+    SHOT_TIMEOUT = pygame.USEREVENT
+    SHOT_COUNTDOWN = pygame.USEREVENT + 1
+    SHOT_TIME = 10000  # milliseconds
+
     def __init__(self):
         super().__init__()
 
@@ -140,6 +144,16 @@ class Countdown(pygame.sprite.Sprite):
 
             self.image.fill(WHITE)
             self.image.blit(text, [0, 0])
+
+    def reset_shot_timer(self):
+        pygame.time.set_timer(Countdown.SHOT_TIMEOUT, Countdown.SHOT_TIME)
+        pygame.time.set_timer(Countdown.SHOT_COUNTDOWN, 1000)
+        self.seconds_left = Countdown.SHOT_TIME / 1000
+
+    def unset_shot_timer(self):
+        pygame.time.set_timer(Countdown.SHOT_TIMEOUT, 0)
+        pygame.time.set_timer(Countdown.SHOT_COUNTDOWN, 0)
+        self.seconds_left = 0
 
 
 class Board(object):
