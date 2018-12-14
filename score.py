@@ -35,7 +35,7 @@ class Score(pygame.sprite.Sprite):
         return points
 
     def time_bonus(self, seconds):
-        self.value += 500000 - 10000 * max(0, max(0, seconds - 15))
+        self.value += max(0, 500000 - 10000 * max(0, seconds - 15))
 
     def update(self):
         # Clear previous score

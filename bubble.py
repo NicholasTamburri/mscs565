@@ -112,7 +112,7 @@ class BoardBubble(Bubble):
             self.connected_bubble_list.add(bubble.connected_bubble_list)
             bubble.connected_bubble_list.add(self.connected_bubble_list)
         for bubble in self.connected_bubble_list:
-            bubble.connected_bubble_list.add(self)
+            bubble.connected_bubble_list.add(self.connected_bubble_list)
 
         self.connected_same_color_bubble_list.add(self)
         for bubble in self.adjacent_bubble_list:
@@ -120,7 +120,8 @@ class BoardBubble(Bubble):
                 self.connected_same_color_bubble_list.add(bubble.connected_same_color_bubble_list)
                 bubble.connected_same_color_bubble_list.add(self.connected_same_color_bubble_list)
         for bubble in self.connected_same_color_bubble_list:
-            bubble.connected_same_color_bubble_list.add(self)
+            bubble.connected_same_color_bubble_list.add(
+                self.connected_same_color_bubble_list)
 
     def __init__(self, centerx, centery, color, board, fired=False):
         super().__init__(centerx, centery, color)
