@@ -397,11 +397,13 @@ class Game(object):
                 self.time_bonus = self.score.value - prev_score
 
                 pygame.time.set_timer(STAGE_TICK, 0)
+                self.board.countdown.unset_shot_timer()
 
                 # End game if any bubble is below the kill line
                 for bubble in self.board.bubble_list:
                     if bubble.rect.centery > self.board.kill_line.rect.y:
                         self.game_over = True
+                        self.board.countdown.unset_shot_timer()
                         break
 
             elif self.bubble.rect.top >= SCREEN_HEIGHT:
