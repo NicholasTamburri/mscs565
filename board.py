@@ -195,7 +195,7 @@ class Board(object):
         self.right_wall = Wall(self.x + self.width + 1, self)
 
         kill_line_y = self.y + self.bubble_diameter\
-                      + (self.rows-1) * self.y_space
+            + (self.rows-1) * self.y_space
         self.kill_line = KillLine(kill_line_y, self)
 
         self.next_sign = NextSign()
