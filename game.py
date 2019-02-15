@@ -226,6 +226,7 @@ class Game(object):
                     angle = math.radians(self.board.arrow.angle - 90)
                     self.bubble.x_change = -math.cos(angle) * speed
                     self.bubble.y_change = math.sin(angle) * speed
+
                     self.board.countdown.unset_shot_timer()
 
                 # Shot countdown
@@ -397,11 +398,35 @@ class Game(object):
 
                 pygame.time.set_timer(STAGE_TICK, 0)
 
-            # End game if any bubble is below the kill line
-            for bubble in self.board.bubble_list:
-                if bubble.rect.centery > self.board.kill_line.rect.y:
-                    self.game_over = True
-                    break
+                # End game if any bubble is below the kill line
+                for bubble in self.board.bubble_list:
+                    if bubble.rect.centery > self.board.kill_line.rect.y:
+                        self.game_over = True
+                        break
+
+            elif self.bubble.rect.top >= SCREEN_HEIGHT:
+                self.board.shots_fired += 1
+
+                # Ready another bubble to be fired
+                self.bubble.reset_pos()
+
+                # Change color of player's bubble
+                self.bubble.color = self.next_bubble.color
+
+                # Change color of next bubble
+                self.next_bubble.color = determine_next(self.board)
+
+                # Move bubbles down depending on shot counter
+                if self.board.shots_fired >= self.board.shift_shots:
+                    self.board.shots_fired = 0
+                    for bubble in self.board.bubble_list:
+                        bubble.rect.y += self.board.y_space
+
+                # End game if any bubble is below the kill line
+                for bubble in self.board.bubble_list:
+                    if bubble.rect.centery > self.board.kill_line.rect.y:
+                        self.game_over = True
+                        break
 
     def display_frame(self, screen):
         """ Display everything to the screen for the game. """
