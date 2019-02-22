@@ -28,18 +28,24 @@ class Game(object):
         class. """
 
     @staticmethod
-    def play_music(music):
+    def play_music(music_file):
         if pygame.mixer:
-            pygame.mixer.music.load(music)
-            pygame.mixer.music.set_volume(0.05)
-            pygame.mixer.music.play()
+            try:
+                pygame.mixer.music.load(music_file)
+                pygame.mixer.music.set_volume(0.05)
+                pygame.mixer.music.play()
+            finally:
+                return
 
     @staticmethod
     def play_sound(sound_file):
         if pygame.mixer:
-            sound = pygame.mixer.Sound(sound_file)
-            sound.set_volume(0.2)
-            sound.play()
+            try:
+                sound = pygame.mixer.Sound(sound_file)
+                sound.set_volume(0.2)
+                sound.play()
+            finally:
+                return
 
     def advance_stage(self):
         # Clean up after previous stage
