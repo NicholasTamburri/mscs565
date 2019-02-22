@@ -1,14 +1,16 @@
 """
 Nicholas Tamburri
-Bust-a-Puzzle Version 0.0.3
+Bust-a-Puzzle Version 0.0.4
 
 A board of bubbles is generated. The player controls the arrow
 at the bottom of the board, which aims and fires bubbles.
 Fired bubbles stick to the bubbles on the board.
+Fired bubbles pop same-colored clusters on contact.
+Bubbles fall when they are no longer anchored to one of the glowing nodes.
 Game ends when a board bubble is below the kill line at the bottom.
 
 Play by aiming the arrow using (fittingly) the arrow keys
-and using the space bar to fire the bubble.
+and firing the bubble using the space bar.
 """
 
 import random
@@ -588,7 +590,7 @@ def main():
     size = [SCREEN_WIDTH, SCREEN_HEIGHT]
     screen = pygame.display.set_mode(size)
 
-    pygame.display.set_caption("Bust-a-Puzzle v0.0.3")
+    pygame.display.set_caption("Bust-a-Puzzle v0.0.4")
 
     # Create our objects and set the data
     done = False
