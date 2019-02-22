@@ -9,7 +9,7 @@ class Score(pygame.sprite.Sprite):
         super().__init__()
 
         self.width = SCREEN_WIDTH
-        self.height = 96
+        self.height = 120
 
         self.image = pygame.Surface([self.width, self.height])
         self.image.fill(WHITE)
